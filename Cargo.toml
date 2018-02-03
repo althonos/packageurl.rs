@@ -1,0 +1,13 @@
+[package]
+name = "packageurl"
+version = "0.1.0"
+authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
+
+[dependencies]
+percent-encoding = "*"
+nom = "*"
+memchr = { version = "*", optional = true}
+
+[dev-dependencies]
+serde_json = "*"
+url = "*"
