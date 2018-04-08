@@ -1,8 +1,5 @@
 //! utils.rs
 
-#[cfg(feature = "memchr")]
-use memchr::{memchr, memrchr};
-
 pub trait JoinableIterator: Iterator {
     fn join(&mut self, separator: &str) -> String;
 }
@@ -37,9 +34,8 @@ pub trait QuickFind {
 
 impl<T> QuickFind for T
 where
-    T: AsRef<str>
+    T: AsRef<str>,
 {
-
     #[cfg(not(feature = "memchr"))]
     fn quickfind(&self, needle: u8) -> Option<usize> {
         self.as_ref().find(char::from(needle))
@@ -52,14 +48,13 @@ where
 
     #[cfg(feature = "memchr")]
     fn quickfind(&self, needle: u8) -> Option<usize> {
-        memchr(needle, self.as_ref().as_bytes())
+        ::memchr::memchr(needle, self.as_ref().as_bytes())
     }
 
     #[cfg(feature = "memchr")]
     fn quickrfind(&self, needle: u8) -> Option<usize> {
-        memrchr(needle, self.as_ref().as_bytes())
+        ::memchr::memrchr(needle, self.as_ref().as_bytes())
     }
-
 }
 
 pub fn rcut(input: &str, sep: u8) -> (&str, &str) {
@@ -70,6 +65,13 @@ pub fn rcut(input: &str, sep: u8) -> (&str, &str) {
     }
 }
 
+pub fn cut(input: &str, sep: u8) -> (&str, &str) {
+    if let Some(i) = input.quickfind(sep) {
+        (&input[..i], &input[i + 1..])
+    } else {
+        (input, "")
+    }
+}
 
 #[cfg(test)]
 mod tests {

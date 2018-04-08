@@ -20,8 +20,7 @@ pub mod owned {
     use utils::JoinableIterator;
     use utils::QuickFind;
 
-    use super::{CowStr, OptCowStr, CowStrMap};
-
+    use super::{CowStr, CowStrMap, OptCowStr};
 
     pub fn parse_subpath<'a>(input: &str) -> IResult<&str, OptCowStr<'a>> {
         if let Some(i) = input.quickrfind(b'#') {
@@ -41,8 +40,8 @@ pub mod owned {
         if let Some(i) = input.quickrfind(b'?') {
             let qualifiers = input[i + 1..]
                 .split('&')
-                .map(|ref pair| utils::rcut(pair, b'='))
-                .filter(|ref pair| !pair.0.is_empty())
+                .map(|ref pair| utils::cut(pair, b'='))
+                .filter(|ref pair| !pair.1.is_empty())
                 .map(|(key, value)| (key.to_lowercase().into(), value.to_string().into()))
                 .collect::<CowStrMap<'a>>();
             IResult::Done(&input[..i], qualifiers)
