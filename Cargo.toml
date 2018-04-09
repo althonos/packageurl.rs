@@ -5,7 +5,7 @@ authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
 
 [dependencies]
 percent-encoding = "*"
-nom = "*"
+error-chain = "*"
 memchr = { version = "*", optional = true}
 
 [dev-dependencies]

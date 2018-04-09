@@ -1,17 +1,11 @@
 //! lib.rs
-#![feature(test)]
-
-#[cfg(test)]
-extern crate test;
-
 #[cfg(feature = "memchr")]
 extern crate memchr;
-
-extern crate nom;
+#[macro_use]
+extern crate error_chain;
 extern crate percent_encoding;
 
-#[macro_use]
-mod macros;
+mod errors;
 mod parser;
 mod purl;
 mod utils;

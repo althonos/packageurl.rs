@@ -4,7 +4,8 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::string::ToString;
 
-use parser;
+use super::parser;
+use super::errors;
 
 #[derive(Debug, Clone)]
 pub struct PackageUrl<'a> {
@@ -71,19 +72,18 @@ impl<'a> PackageUrl<'a> {
 
 
 
-impl<'a> FromStr for PackageUrl<'a> {
-    type Err = ();
+impl FromStr for PackageUrl<'static> {
+    type Err = errors::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use nom;
 
-        // Parse all components
-        let (s, subpath) = try_parse!(s, parser::owned::parse_subpath);
-        let (s, qualifiers) = try_parse!(s, parser::owned::parse_qualifiers);
-        let (s, version) = try_parse!(s, parser::owned::parse_version);
-        let (s, scheme) = try_parse!(s, parser::owned::parse_scheme);
-        let (s, mut name) = try_parse!(s, parser::owned::parse_name);
-        let (_, mut namespace) = try_parse!(s, parser::owned::parse_namespace);
+        // Parse all components into strings (since we don't know infer from `s` lifetime)
+        let (s, subpath) = parser::owned::parse_subpath(s)?;
+        let (s, ql) = parser::owned::parse_qualifiers(s)?;
+        let (s, version) = parser::owned::parse_version(s)?;
+        let (s, scheme) = parser::owned::parse_scheme(s)?;
+        let (s, mut name) = parser::owned::parse_name(s)?;
+        let (_, mut namespace) = parser::owned::parse_namespace(s)?;
 
         // Special rules for some schemes
         match scheme.as_ref() {
@@ -97,14 +97,18 @@ impl<'a> FromStr for PackageUrl<'a> {
             _ => {}
         };
 
+        let qualifiers = ql.into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect::<HashMap<_, _>>();
+
         // The obtained package url
         Ok(PackageUrl {
-            scheme,
-            namespace,
-            name,
-            version,
+            scheme: Cow::Owned(scheme),
+            namespace: namespace.map(Cow::Owned),
+            name: Cow::Owned(name),
+            version: version.map(Cow::Owned),
             qualifiers,
-            subpath,
+            subpath: subpath.map(Cow::Owned),
         })
     }
 }
