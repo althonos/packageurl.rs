@@ -93,4 +93,31 @@ mod tests {
         assert_eq!(dst, "");
     }
 
+    #[test]
+    fn test_quickfind() {
+        let buf = "Hello, world !";
+        assert_eq!(buf.quickfind(b'o'), Some(4));
+        assert_eq!(buf.quickfind(b'c'), None);
+    }
+
+    #[test]
+    fn test_quickrfind() {
+        let buf = "Hello, world !";
+        assert_eq!(buf.quickrfind(b'o'), Some(8));
+        assert_eq!(buf.quickrfind(b'c'), None)
+    }
+
+    #[test]
+    fn test_cut() {
+        let buf = "A:B:C";
+        assert_eq!(cut(buf, b':'), ("A", "B:C"));
+        assert_eq!(cut(buf, b','), ("A:B:C", ""));
+    }
+
+    #[test]
+    fn test_rcut() {
+        let buf = "A:B:C";
+        assert_eq!(rcut(buf, b':'), ("A:B", "C"));
+        assert_eq!(rcut(buf, b','), ("", "A:B:C"));
+    }
 }
