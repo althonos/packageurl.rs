@@ -1,7 +1,8 @@
 #[macro_use]
 mod macros;
-mod utils;
+mod testcase;
 
+// Nov 30, 2017
 static TEST_DATA: &[u8] = include_bytes!("test-suite-data.json");
 
 spec_tests!(type_required, "type is required");
@@ -22,5 +23,6 @@ spec_tests!(go_version, "valid go purl with version and subpath");
 spec_tests!(maven_qualifiers, "maven uses qualifiers");
 spec_tests!(maven_pom, "maven pom reference");
 spec_tests!(maven_type, "maven uses type");
-spec_tests!(slash, "slash after type is not significant");
+spec_tests!(simple_slash, "slash after type is not significant");
 spec_tests!(double_slash, "double slash after type is not significant");
+spec_tests!(triple_slash, "triple slash after type is not significant");
