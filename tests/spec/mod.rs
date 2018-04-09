@@ -2,9 +2,6 @@
 mod macros;
 mod testcase;
 
-// Nov 30, 2017
-static TEST_DATA: &[u8] = include_bytes!("test-suite-data.json");
-
 spec_tests!(type_required, "type is required");
 spec_tests!(name_required, "name is required");
 spec_tests!(gem, "gem uses qualifiers");

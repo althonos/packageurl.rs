@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
+// Nov 30, 2017
+static TEST_SUITE: &[u8] = include_bytes!("test-suite-data.json");
 
 #[derive(Serialize, Deserialize)]
 pub struct SpecTestCase<'a> {
@@ -18,9 +20,8 @@ pub struct SpecTestCase<'a> {
 
 
 impl<'a> SpecTestCase<'a> {
-
     pub fn new(desc: &'a str) -> Self {
-        if let Ok(::serde_json::Value::Array(v)) = ::serde_json::from_slice(super::TEST_DATA) {
+        if let Ok(::serde_json::Value::Array(v)) = ::serde_json::from_slice(TEST_SUITE) {
             let json = v
                 .into_iter()
                 .find(|x| x["description"].as_str().unwrap().eq(desc)).unwrap();
@@ -29,5 +30,4 @@ impl<'a> SpecTestCase<'a> {
             unreachable!()
         }
     }
-
 }
