@@ -1,0 +1,8 @@
+[package]
+name = "afl"
+version = "0.1.0"
+authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
+
+[dependencies]
+afl = "*"
+packageurl = { version = "*", path = ".." }
