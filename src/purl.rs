@@ -16,6 +16,61 @@ pub struct PackageUrl<'a> {
     pub subpath: Option<Cow<'a, str>>,
 }
 
+
+impl<'a> PackageUrl<'a> {
+
+    pub fn new<S, N>(scheme: S, name: N) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+        N: Into<Cow<'a, str>>,
+    {
+        Self {
+            scheme: scheme.into(),
+            namespace: None,
+            name: name.into(),
+            version: None,
+            qualifiers: HashMap::new(),
+            subpath: None,
+        }
+    }
+
+    pub fn with_namespace<N>(&mut self, namespace: N) -> &mut Self
+    where
+        N: Into<Cow<'a, str>>
+    {
+        self.namespace = Some(namespace.into());
+        self
+    }
+
+    pub fn with_version<V>(&mut self, version: V) -> &mut Self
+    where
+        V: Into<Cow<'a, str>>
+    {
+        self.version = Some(version.into());
+        self
+    }
+
+    pub fn with_subpath<S>(&mut self, subpath: S) -> &mut Self
+    where
+        S: Into<Cow<'a, str>>
+    {
+        self.subpath = Some(subpath.into());
+        self
+    }
+
+    pub fn add_qualifier<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
+    {
+        self.qualifiers.insert(key.into(), value.into());
+        self
+    }
+
+}
+
+
+
 impl<'a> FromStr for PackageUrl<'a> {
     type Err = ();
 
@@ -99,6 +154,7 @@ impl<'a> ToString for PackageUrl<'a> {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
 
@@ -119,9 +175,15 @@ mod tests {
 
     #[test]
     fn test_to_str() {
-        let raw_purl = "type:name/space/name@version?k1=v1&k2=v2#sub/path";
-        let purl = PackageUrl::from_str(raw_purl).unwrap();
-        assert_eq!(&purl.to_string(), raw_purl);
+        let canonical = "type:name/space/name@version?k1=v1&k2=v2#sub/path";
+        let purl_string = PackageUrl::new("type", "name")
+            .with_namespace("name/space")
+            .with_version("version")
+            .with_subpath("sub/path")
+            .add_qualifier("k1", "v1")
+            .add_qualifier("k2", "v2")
+            .to_string();
+        assert_eq!(&purl_string, canonical);
     }
 
 }
