@@ -6,6 +6,7 @@ authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
 [dependencies]
 percent-encoding = "*"
 error-chain = "*"
+indexmap = "*"
 memchr = { version = "*", optional = true}
 
 [dev-dependencies]
@@ -13,3 +14,4 @@ serde = "*"
 serde_derive = "*"
 serde_json = "*"
 lazy_static = "*"
+indexmap = { features = ["serde-1"], version = "*" }

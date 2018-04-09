@@ -2,7 +2,6 @@
 
 pub mod owned {
 
-    use ::std::collections::HashMap;
     use ::percent_encoding::percent_decode;
 
     use super::super::errors;
@@ -23,17 +22,17 @@ pub mod owned {
         }
     }
 
-    pub fn parse_qualifiers<'a>(input: &str) -> errors::Result<(&str, HashMap<String, String>)> {
+    pub fn parse_qualifiers<'a>(input: &str) -> errors::Result<(&str, Vec<(String, String)>)> {
         if let Some(i) = input.quickrfind(b'?') {
             let qualifiers = input[i + 1..]
                 .split('&')
                 .map(|ref pair| utils::cut(pair, b'='))
                 .filter(|ref pair| !pair.1.is_empty())
                 .map(|(key, value)| (key.to_lowercase(), value.to_string()))
-                .collect::<HashMap<_, _>>();
+                .collect();
             Ok((&input[..i], qualifiers))
         } else {
-            Ok((input, HashMap::new()))
+            Ok((input, Vec::new()))
         }
     }
 

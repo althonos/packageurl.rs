@@ -1,8 +1,8 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
+use ::std::borrow::Cow;
+use ::std::str::FromStr;
+use ::std::string::ToString;
 
-use std::str::FromStr;
-use std::string::ToString;
+use ::indexmap::IndexMap;
 
 use super::parser;
 use super::errors;
@@ -13,7 +13,7 @@ pub struct PackageUrl<'a> {
     pub namespace: Option<Cow<'a, str>>,
     pub name: Cow<'a, str>,
     pub version: Option<Cow<'a, str>>,
-    pub qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    pub qualifiers: IndexMap<Cow<'a, str>, Cow<'a, str>>,
     pub subpath: Option<Cow<'a, str>>,
 }
 
@@ -30,7 +30,7 @@ impl<'a> PackageUrl<'a> {
             namespace: None,
             name: name.into(),
             version: None,
-            qualifiers: HashMap::new(),
+            qualifiers: IndexMap::new(),
             subpath: None,
         }
     }
@@ -97,19 +97,27 @@ impl FromStr for PackageUrl<'static> {
             _ => {}
         };
 
-        let qualifiers = ql.into_iter()
-            .map(|(k, v)| (k.into(), v.into()))
-            .collect::<HashMap<_, _>>();
+        let mut purl = Self::new(scheme, name);
+        if let Some(ns) = namespace { purl.with_namespace(ns); }
+        if let Some(v) = version { purl.with_version(v); }
+        if let Some(sp) = subpath { purl.with_subpath(sp); }
+        for (k, v) in ql.into_iter() { purl.add_qualifier(k, v); }
+
+        // Turn qualifiers into a `HashMap<Cow, Cow>`
+        // let qualifiers = ql.into_iter()
+        //     .map(|(k, v)| (k.into(), v.into()))
+        //     .collect::<HashMap<_, _>>();
 
         // The obtained package url
-        Ok(PackageUrl {
-            scheme: Cow::Owned(scheme),
-            namespace: namespace.map(Cow::Owned),
-            name: Cow::Owned(name),
-            version: version.map(Cow::Owned),
-            qualifiers,
-            subpath: subpath.map(Cow::Owned),
-        })
+        Ok(purl)
+        // Ok(PackageUrl {
+        //     scheme: Cow::Owned(scheme),
+        //     namespace: namespace.map(Cow::Owned),
+        //     name: Cow::Owned(name),
+        //     version: version.map(Cow::Owned),
+        //     qualifiers,
+        //     subpath: subpath.map(Cow::Owned),
+        // })
     }
 }
 

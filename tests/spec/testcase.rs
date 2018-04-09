@@ -1,10 +1,10 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
+use ::std::borrow::Cow;
+use ::indexmap::IndexMap;
 
 // Nov 30, 2017
 static TEST_SUITE: &[u8] = include_bytes!("test-suite-data.json");
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 pub struct SpecTestCase<'a> {
     pub description: Cow<'a, str>,
     pub purl: Cow<'a, str>,
@@ -13,7 +13,7 @@ pub struct SpecTestCase<'a> {
     pub namespace: Option<Cow<'a, str>>,
     pub name: Cow<'a, str>,
     pub version: Option<Cow<'a, str>>,
-    pub qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    pub qualifiers: IndexMap<Cow<'a, str>, Cow<'a, str>>,
     pub subpath: Option<Cow<'a, str>>,
     pub is_invalid: bool
 }
