@@ -1,5 +1,3 @@
-//! parser.rs
-
 use super::errors;
 use super::utils;
 

@@ -10,20 +10,27 @@ use super::errors;
 use super::utils::PercentCodec;
 
 
-
+/// A Package URL.
 #[derive(Debug, Clone)]
 pub struct PackageUrl<'a> {
+    /// The package URL scheme (its *type*).
     pub scheme: Cow<'a, str>,
+    /// The optional namespace
     pub namespace: Option<Cow<'a, str>>,
+    /// The package name.
     pub name: Cow<'a, str>,
+    /// The optional package version.
     pub version: Option<Cow<'a, str>>,
+    /// The package qualifiers.
     pub qualifiers: IndexMap<Cow<'a, str>, Cow<'a, str>>,
+    /// The package subpath.
     pub subpath: Option<Cow<'a, str>>,
 }
 
 
 impl<'a> PackageUrl<'a> {
 
+    /// Create a new Package URL with the provided scheme and name.
     pub fn new<S, N>(scheme: S, name: N) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -39,6 +46,7 @@ impl<'a> PackageUrl<'a> {
         }
     }
 
+    /// Assign a namespace to the package.
     pub fn with_namespace<N>(&mut self, namespace: N) -> &mut Self
     where
         N: Into<Cow<'a, str>>
@@ -47,6 +55,7 @@ impl<'a> PackageUrl<'a> {
         self
     }
 
+    /// Assign a version to the package.
     pub fn with_version<V>(&mut self, version: V) -> &mut Self
     where
         V: Into<Cow<'a, str>>
@@ -55,6 +64,7 @@ impl<'a> PackageUrl<'a> {
         self
     }
 
+    /// Assign a subpath to the package.
     pub fn with_subpath<S>(&mut self, subpath: S) -> &mut Self
     where
         S: Into<Cow<'a, str>>
@@ -63,6 +73,7 @@ impl<'a> PackageUrl<'a> {
         self
     }
 
+    /// Add a qualifier to the package.
     pub fn add_qualifier<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<Cow<'a, str>>,
