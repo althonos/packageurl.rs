@@ -3,9 +3,13 @@ use ::std::str::FromStr;
 use ::std::string::ToString;
 
 use ::indexmap::IndexMap;
+use ::percent_encoding::USERINFO_ENCODE_SET;
 
 use super::parser;
 use super::errors;
+use super::utils::PercentCodec;
+
+
 
 #[derive(Debug, Clone)]
 pub struct PackageUrl<'a> {
@@ -70,8 +74,6 @@ impl<'a> PackageUrl<'a> {
 
 }
 
-
-
 impl FromStr for PackageUrl<'static> {
     type Err = errors::Error;
 
@@ -103,21 +105,8 @@ impl FromStr for PackageUrl<'static> {
         if let Some(sp) = subpath { purl.with_subpath(sp); }
         for (k, v) in ql.into_iter() { purl.add_qualifier(k, v); }
 
-        // Turn qualifiers into a `HashMap<Cow, Cow>`
-        // let qualifiers = ql.into_iter()
-        //     .map(|(k, v)| (k.into(), v.into()))
-        //     .collect::<HashMap<_, _>>();
-
         // The obtained package url
         Ok(purl)
-        // Ok(PackageUrl {
-        //     scheme: Cow::Owned(scheme),
-        //     namespace: namespace.map(Cow::Owned),
-        //     name: Cow::Owned(name),
-        //     version: version.map(Cow::Owned),
-        //     qualifiers,
-        //     subpath: subpath.map(Cow::Owned),
-        // })
     }
 }
 
@@ -125,21 +114,31 @@ impl<'a> ToString for PackageUrl<'a> {
     fn to_string(&self) -> String {
         let mut url = String::new();
 
+        // Scheme: no encoding needed
         url.push_str(&self.scheme);
         url.push(':');
 
+        // Namespace: percent-encode each component
         if let Some(ref ns) = self.namespace {
-            url.push_str(ns);
-            url.push('/');
+            ns.split('/')
+                .filter(|s| !s.is_empty())
+                .map(|s| s.encode(USERINFO_ENCODE_SET))
+                .for_each(|pe| {
+                    pe.for_each(|s| url.push_str(s));
+                    url.push('/')
+                });
         }
 
-        url.push_str(&self.name);
+        // Name: percent-encode the name
+        self.name.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
 
+        // Version: percent-encode the version
         if let Some(ref v) = self.version {
             url.push('@');
-            url.push_str(v);
+            v.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
         }
 
+        // Qualifiers: percent-encode the values
         if !self.qualifiers.is_empty() {
             url.push('?');
 
@@ -150,16 +149,27 @@ impl<'a> ToString for PackageUrl<'a> {
             while let Some(&(k, v)) = it.next() {
                 url.push_str(&k);
                 url.push('=');
-                url.push_str(&v);
-                if let Some(_) = it.peek() {
+                &v.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
+                if it.peek().is_some() {
                     url.push('&')
                 };
             }
         }
 
+        // Subpath: percent-encode the components
         if let Some(ref sp) = self.subpath {
             url.push('#');
-            url.push_str(sp);
+            let components = sp
+                .split('/')
+                .filter(|&s| match s {"" | "." | ".." => false, _ => true})
+                .map(|s| s.encode(USERINFO_ENCODE_SET));
+            let ref mut it = components.peekable();
+            while let Some(component) = it.next() {
+                component.for_each(|s| url.push_str(s));
+                if it.peek().is_some() {
+                    url.push('/')
+                }
+            }
         }
 
         url

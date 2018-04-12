@@ -1,12 +1,13 @@
 //! parser.rs
 
+use super::errors;
+use super::utils;
+
 pub mod owned {
 
-    use ::percent_encoding::percent_decode;
-
-    use super::super::errors;
-    use super::super::utils;
-    use utils::{QuickFind, JoinableIterator};
+    use super::errors;
+    use super::utils;
+    use utils::{QuickFind, JoinableIterator, PercentCodec};
 
     pub fn parse_subpath<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {
         if let Some(i) = input.quickrfind(b'#') {
@@ -14,7 +15,7 @@ pub mod owned {
                 .trim_matches('/')
                 .split('/')
                 .filter(|&c| !(c.is_empty() || c == "." || c == ".."))
-                .map(|c| percent_decode(c.as_bytes()).decode_utf8_lossy())
+                .map(|c| c.as_bytes().decode().decode_utf8_lossy())
                 .join("/");
             Ok((&input[..i], Some(subpath)))
         } else {
@@ -58,9 +59,7 @@ pub mod owned {
         let canonical_name = if name.is_empty() {
             bail!(errors::ErrorKind::MissingName)
         } else {
-            percent_decode(name.as_bytes())
-                .decode_utf8_lossy()
-                .to_string()
+            name.decode().decode_utf8_lossy().to_string()
         };
 
         Ok((rem, canonical_name))
@@ -72,7 +71,7 @@ pub mod owned {
                 .trim_matches('/')
                 .split('/')
                 .filter(|&c| !(c.is_empty() || c == "." || c == ".."))
-                .map(|c| percent_decode(c.as_bytes()).decode_utf8_lossy())
+                .map(|c| c.decode().decode_utf8_lossy())
                 .join("/");
             Ok(("", Some(namespace)))
         } else {

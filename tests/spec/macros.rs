@@ -48,15 +48,16 @@ macro_rules! spec_tests {
 
                 let purl = PackageUrl::from_str(&TEST_CASE.canonical_purl).unwrap();
                 assert_eq!(TEST_CASE.canonical_purl, purl.to_string());
-
             }
 
-
-
-            // #[test]
-            // fn purl_to_canonical() {
-            //
-            // }
+            #[test]
+            fn purl_to_canonical() {
+                if TEST_CASE.is_invalid {
+                    return;
+                }
+                let purl = PackageUrl::from_str(&TEST_CASE.purl).unwrap();
+                assert_eq!(TEST_CASE.canonical_purl, purl.to_string())
+            }
 
         }
 
