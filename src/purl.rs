@@ -1,8 +1,8 @@
 use ::std::borrow::Cow;
 use ::std::str::FromStr;
 use ::std::string::ToString;
+use ::std::collections::HashMap;
 
-use ::indexmap::IndexMap;
 use ::percent_encoding::USERINFO_ENCODE_SET;
 
 use super::parser;
@@ -22,7 +22,7 @@ pub struct PackageUrl<'a> {
     /// The optional package version.
     pub version: Option<Cow<'a, str>>,
     /// The package qualifiers.
-    pub qualifiers: IndexMap<Cow<'a, str>, Cow<'a, str>>,
+    pub qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
     /// The package subpath.
     pub subpath: Option<Cow<'a, str>>,
 }
@@ -41,7 +41,7 @@ impl<'a> PackageUrl<'a> {
             namespace: None,
             name: name.into(),
             version: None,
-            qualifiers: IndexMap::new(),
+            qualifiers: HashMap::new(),
             subpath: None,
         }
     }

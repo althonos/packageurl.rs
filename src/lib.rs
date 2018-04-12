@@ -39,7 +39,6 @@ extern crate memchr;
 #[macro_use]
 extern crate error_chain;
 extern crate percent_encoding;
-extern crate indexmap;
 
 mod parser;
 mod utils;
