@@ -1,1 +1,1 @@
-type:namespace/name@version?qualifiers#subpath
+type:name/space/name@version?q1=v1&q2=v2#subpath
