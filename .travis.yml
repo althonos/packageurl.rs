@@ -1,0 +1,44 @@
+sudo: false
+dist: trusty
+language: rust
+cache: cargo
+
+addons:
+  apt:
+    packages:
+    - libssl-dev
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+env:
+  global:
+  - RUSTFLAGS="-C link-dead-code"
+  - RUST_BACKTRACE=1
+  - CARGO_MAKE_RUN_CODECOV=true
+  - CARGO_MAKE_URL="https://bintray.com/sagiegurari/cargo-make/download_file?file_path=cargo-make_v"
+
+before_install:
+  - curl -SsL $CARGO_MAKE_URL$(cargo search cargo-make | grep cargo-make | cut -d\" -f2) > ~/.cargo/bin/cargo-make
+  - chmod 777 ~/.cargo/bin/cargo-make
+
+script:
+  - cargo make ci-flow
+
+after_success:
+  - cargo make audit
+  - cargo make chandler
+
+deploy:
+  provider: script
+  script: cargo publish -t $CRATES_IO_TOKEN
+  on:
+    tags: true
+    repo: althonos/packageurl-rs
+    rust: stable
+
+notifications:
+  email:
+  - althonosdev@gmail.com
