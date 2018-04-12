@@ -1,0 +1,28 @@
+[env]
+AFL_SKIP_CPUFREQ = "true"
+AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES = "true"
+
+[tasks.build-afl]
+install_crate = "afl"
+command = "cargo"
+args = ["afl", "build", "--manifest-path", "afl/Cargo.toml", "--release"]
+
+[tasks.afl]
+dependencies = ["build-afl"]
+install_crate = "afl"
+command = "cargo"
+args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"]
+
+
+[tasks.coverage]
+alias = "coverage-tarpaulin-xml"
+
+[tasks.coverage-tarpaulin-xml]
+install_script = ["curl -SsL https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh | bash"]
+command = "cargo"
+args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
+
+[tasks.chandler]
+install_script = ["gem install chandler -n target/gems"]
+command = "target/gems/chandler"
+args = ["push", "--github=althonos/pruefung"]
