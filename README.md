@@ -13,8 +13,8 @@
 
 ## About
 
-This crate is an implementation of the [Package URL] specification for the
-[Rust] programming language.
+This crate is an implementation of the [Package URL](https://github.com/package-url/purl-spec)
+specification for the [Rust](http://rust-lang.org/) programming language.
 
 ## Usage
 
@@ -25,7 +25,8 @@ Add this crate to the `Cargo.toml`:
 packageurl = "^0.1.0"
 ```
 
-Read a raw PURL using the [`FromStr`] trait:
+Parse a string containing a raw PURL using the
+[`FromStr`](https://doc.rust-lang.org/std/str/trait.FromStr.html) trait:
 
 ```rust
 extern crate packageurl
@@ -35,7 +36,8 @@ use packageurl::PackageUrl;
 let purl = PackageUrl::from_str("cargo:packageurl@0.1.0")
 ```
 
-Generate a canonical PURL using the [`ToString`] trait:
+Generate a canonical PURL using the
+[`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html) trait:
 
 ```rust
 extern crate packageurl;
@@ -47,10 +49,4 @@ let canonical = PackageUrl::new("cargo", "packageurl")
     .to_string();
 ```
 
-See more in the [online documentation](https://docs.rs/packageurl/)
-
-<!-- General links -->
-[Package URL]: https://github.com/package-url/purl-spec
-[Rust]: http://rust-lang.org/
-
-<!-- API documentation -->
+See more in the [online documentation](https://docs.rs/packageurl/).
