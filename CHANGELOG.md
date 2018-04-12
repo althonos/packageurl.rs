@@ -6,4 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- This CHANGELOG file
+- Test cases based on the PURL specification test suite.
+- A small README file showing usecases and installation instructions.
+- This CHANGELOG file.

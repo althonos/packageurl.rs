@@ -13,7 +13,7 @@
 
 ## About
 
-This crate is an imlementation of the [Package URL] specification for the
+This crate is an implementation of the [Package URL] specification for the
 [Rust] programming language.
 
 ## Usage

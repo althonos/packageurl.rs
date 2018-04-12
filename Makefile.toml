@@ -13,7 +13,6 @@ install_crate = "afl"
 command = "cargo"
 args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"]
 
-
 [tasks.coverage]
 alias = "coverage-tarpaulin-xml"
 
