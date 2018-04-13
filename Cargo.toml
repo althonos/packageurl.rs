@@ -2,11 +2,17 @@
 name = "packageurl"
 version = "0.1.0"
 authors = ["Martin Larralde <martin.larralde@ens-paris-saclay.fr>"]
+license = "MIT"
+description = "Rust implementation of the package url specification"
+documentation = "https://docs.rs/packageurl"
+repository = "https://github.com/althonos/packageurl-rs"
+readme = "README.md"
+keywords = ["purl", "package-url"]
+categories = ["parser-implementations", "encoding", "development-tools"]
 
 [dependencies]
 percent-encoding = "*"
 error-chain = "*"
-serde = { version = "*", optional = true}
 memchr = { version = "*", optional = true}
 
 [dev-dependencies]
@@ -15,3 +21,8 @@ serde_derive = "*"
 serde_json = "*"
 lazy_static = "*"
 url = "*"
+
+[badges]
+travis-ci   = { repository = "althonos/packageurl-rs" }
+codecov     = { repository = "althonos/packageurl-rs" }
+maintenance = { status = "actively-developed" }
