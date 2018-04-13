@@ -50,3 +50,10 @@ let canonical = PackageUrl::new("cargo", "packageurl")
 ```
 
 See more in the [online documentation](https://docs.rs/packageurl/).
+
+
+## Note
+
+The specification is not completely enforced right now: in particular, it will
+allow building Package URLs with invalid namespaces and the like. More validations
+and errors are to be added in the future.

@@ -4,7 +4,6 @@
 
 error_chain! {
     errors {
-        /// Missing name
         MissingName {
             description("missing name")
             display("missing scheme")

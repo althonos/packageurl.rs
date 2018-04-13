@@ -88,8 +88,7 @@ impl<'a> PackageUrl<'a> {
 impl FromStr for PackageUrl<'static> {
     type Err = errors::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-
+    fn from_str(s: &str) -> errors::Result<Self> {
         // Parse all components into strings (since we don't know infer from `s` lifetime)
         let (s, subpath) = parser::owned::parse_subpath(s)?;
         let (s, ql) = parser::owned::parse_qualifiers(s)?;
@@ -119,6 +118,7 @@ impl FromStr for PackageUrl<'static> {
         // The obtained package url
         Ok(purl)
     }
+
 }
 
 impl<'a> ToString for PackageUrl<'a> {
