@@ -24,4 +24,4 @@ args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
 [tasks.chandler]
 install_script = ["gem install chandler -n target/gems"]
 command = "target/gems/chandler"
-args = ["push", "--github=althonos/pruefung"]
+args = ["push", "--github=althonos/package-url"]
