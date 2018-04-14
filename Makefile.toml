@@ -58,6 +58,7 @@ condition_script = ['test ! -d "$SCCACHE_DIR"']
 script = ['mkdir "$SCCACHE_DIR"']
 
 [tasks.ci-setup-flow]
+condition = { env = { "TRAVIS" = "true" } }
 dependencies = [
     'ci-install-sccache',
     'ci-setup-sccache',
@@ -67,16 +68,28 @@ dependencies = [
 
 ### CI flow ####################################################################
 
+[tasks.ci-flow]
+env = { "RUSTC_WRAPPER" = "sccache" }
+
 [tasks.coverage]
 alias = "coverage-tarpaulin"
 
+[tasks.ci-setup-tarpaulin]
+condition = { env = { "TRAVIS" = "true" } }
+condition_script = ['test ! -f $HOME/.cargo/bin/cargo-tarpaulin']
+script = [
+    '''
+    LATEST=$(cargo search cargo-tarpaulin | grep cargo-tarpaulin | cut -f2 -d"\"")
+    URL="https://github.com/xd009642/tarpaulin/releases/download/${LATEST}/cargo-tarpaulin-${LATEST}-travis.tar.gz"
+    curl -SsL $URL | tar xzvC $HOME/.cargo/bin
+    '''
+]
+
+[tasks.pre-coverage]
+dependencies = ["ci-setup-tarpaulin"]
+
 [tasks.post-ci-flow]
 dependencies = ["audit"]
-
-# [tasks.coverage-tarpaulin-xml]
-# install_script = ["curl -SsL https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh | bash"]
-# command = "cargo"
-# args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
 
 
 ### Release flow ###############################################################
