@@ -18,11 +18,12 @@ env:
   - CARGO_MAKE_RUN_CODECOV=true
   - RUSTFLAGS="-C link-dead-code"
   - RUST_BACKTRACE=1
-  - RUSTC_WRAPPER="sccache"
+  # - RUSTC_WRAPPER="sccache"
   - SCCACHE_DIR="$HOME/.cargo/sccache"
 
 before_install:
-  - [ ! -f "$HOME/.cargo/bin/cargo-make" ] && RUSTC_WRAPPER="" cargo install --debug cargo-make
+  - if [ ! -f "$HOME/.cargo/bin/cargo-make" ]; then cargo install --debug cargo-make; fi
+  - export RUSTC_WRAPPER="sccache"
   - cargo make ci-setup-flow
 
 script:

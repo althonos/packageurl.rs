@@ -9,7 +9,7 @@ AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES = "true"
 alias = "afl"
 
 [tasks.build-afl]
-description = "Compiles the library to be used with the AFL fuzzer"
+description = "Compiles the library to be used with the AFL fuzzer."
 install_crate = "afl"
 command = "cargo"
 args = ["afl", "build", "--manifest-path", "afl/Cargo.toml", "--release"]
@@ -25,11 +25,11 @@ args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"
 ### CI setup flow ##############################################################
 
 [tasks.ci-install-sccache]
-description = "Install the `sccache` compiled executable from GitHub releases"
+description = "Install the `sccache` compiled executable from GitHub releases."
 condition_script = ['test ! -f "$HOME/.cargo/bin/sccache"']
 script = [
     '''
-    LATEST=$(cargo search sccache | grep sccache | cut -f2 -d'\"'
+    LATEST=$(cargo search sccache | grep sccache | cut -f2 -d"\"")
     URL="https://github.com/mozilla/sccache/releases/download/${LATEST}/sccache-${LATEST}-x86_64-unknown-linux-musl.tar.gz"
     curl -SsL $URL | tar xzv -C /tmp
     mv /tmp/sccache-${LATEST}-x86_64-unknown-linux-musl/sccache $HOME/.cargo/bin/sccache
@@ -37,12 +37,12 @@ script = [
 ]
 
 [tasks.ci-install-update]
-description = "Install the `cargo install-update` compiled executable from GitHub releases"
+description = "Install the `cargo install-update` compiled executable from GitHub releases."
 condition_script = ['test ! -f "$HOME/.cargo/bin/cargo-install-update"']
 script = [
     '''
-    LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d'\"'
-    URL="https://github.com/nabijaczleweli/cargo-update/releases/download/${LATEST}/cargo-install-update-${LATEST}.tbz2"
+    LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d"\"")
+    URL="https://github.com/nabijaczleweli/cargo-update/releases/download/v${LATEST}/cargo-install-update-v${LATEST}.tbz2"
     curl -SsL $URL | tar xjvC $HOME/.cargo/bin
     '''
 ]
@@ -52,8 +52,17 @@ command = "cargo"
 args = ["install-update", "-a"]
 dependencies = ["ci-install-update"]
 
+[tasks.ci-setup-sccache]
+env = { "RUSTC_WRAPPER" = "sccache" }
+condition_script = ['test ! -d "$SCCACHE_DIR"']
+script = ['mkdir "$SCCACHE_DIR"']
+
 [tasks.ci-setup-flow]
-dependencies = ['ci-install-sccache', 'ci-install-update', 'ci-update-all']
+dependencies = [
+    'ci-install-sccache',
+    'ci-setup-sccache',
+    'ci-update-all'
+]
 
 
 ### CI flow ####################################################################
