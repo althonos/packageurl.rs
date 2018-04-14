@@ -2,26 +2,87 @@
 AFL_SKIP_CPUFREQ = "true"
 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES = "true"
 
+
+### Fuzzing tasks ##############################################################
+
+[tasks.fuzz]
+alias = "afl"
+
 [tasks.build-afl]
+description = "Compiles the library to be used with the AFL fuzzer"
 install_crate = "afl"
 command = "cargo"
 args = ["afl", "build", "--manifest-path", "afl/Cargo.toml", "--release"]
 
 [tasks.afl]
+description = "Runs the American Fuzzy Lop fuzzer on the library."
 dependencies = ["build-afl"]
 install_crate = "afl"
 command = "cargo"
 args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"]
 
-[tasks.coverage]
-alias = "coverage-tarpaulin-xml"
 
-[tasks.coverage-tarpaulin-xml]
-install_script = ["curl -SsL https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh | bash"]
+### CI setup flow ##############################################################
+
+[tasks.ci-install-sccache]
+description = "Install the `sccache` compiled executable from GitHub releases"
+condition_script = ['test ! -f "$HOME/.cargo/bin/sccache"']
+script = [
+    '''
+    LATEST=$(cargo search sccache | grep sccache | cut -f2 -d'\"'
+    URL="https://github.com/mozilla/sccache/releases/download/${LATEST}/sccache-${LATEST}-x86_64-unknown-linux-musl.tar.gz"
+    curl -SsL $URL | tar xzv -C /tmp
+    mv /tmp/sccache-${LATEST}-x86_64-unknown-linux-musl/sccache $HOME/.cargo/bin/sccache
+    '''
+]
+
+[tasks.ci-install-update]
+description = "Install the `cargo install-update` compiled executable from GitHub releases"
+condition_script = ['test ! -f "$HOME/.cargo/bin/cargo-install-update"']
+script = [
+    '''
+    LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d'\"'
+    URL="https://github.com/nabijaczleweli/cargo-update/releases/download/${LATEST}/cargo-install-update-${LATEST}.tbz2"
+    curl -SsL $URL | tar xjvC $HOME/.cargo/bin
+    '''
+]
+
+[tasks.ci-update-all]
 command = "cargo"
-args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
+args = ["install-update", "-a"]
+dependencies = ["ci-install-update"]
+
+[tasks.ci-setup-flow]
+dependencies = ['ci-install-sccache', 'ci-install-update', 'ci-update-all']
+
+
+### CI flow ####################################################################
+
+[tasks.coverage]
+alias = "coverage-tarpaulin"
+
+[tasks.post-ci-flow]
+dependencies = ["audit"]
+
+# [tasks.coverage-tarpaulin-xml]
+# install_script = ["curl -SsL https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh | bash"]
+# command = "cargo"
+# args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
+
+
+### Release flow ###############################################################
+
+[tasks.pre-publish]
+dependencies = ["verify-project"]
+
+[tasks.publish]
+args = ["publish", "--token", "$CRATES_IO_TOKEN"]
+
+[tasks.post-publish]
+dependencies = ["chandler"]
 
 [tasks.chandler]
+description = "Update GitHub release notes with appropriate CHANGELOG sections"
 install_script = ["gem install chandler -n target/gems"]
 command = "target/gems/chandler"
-args = ["push", "--github=althonos/package-url"]
+args = ["push", "--github=$(echo $CARGO_MAKE_CRATE_REPOSITORY | cut -d/ -f4-5)"]
