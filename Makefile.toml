@@ -26,7 +26,7 @@ args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"
 
 [tasks.ci-install-sccache]
 description = "Install the `sccache` compiled executable from GitHub releases."
-condition_script = ['test ! -f "$HOME/.cargo/bin/sccache"']
+# condition_script = ['test ! -f "$HOME/.cargo/bin/sccache"']
 script = [
     '''
     LATEST=$(cargo search sccache | grep sccache | cut -f2 -d"\"")
@@ -36,21 +36,21 @@ script = [
     '''
 ]
 
-[tasks.ci-install-update]
-description = "Install the `cargo install-update` compiled executable from GitHub releases."
-condition_script = ['test ! -f "$HOME/.cargo/bin/cargo-install-update"']
-script = [
-    '''
-    LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d"\"")
-    URL="https://github.com/nabijaczleweli/cargo-update/releases/download/v${LATEST}/cargo-install-update-v${LATEST}.tbz2"
-    curl -SsL $URL | tar xjvC $HOME/.cargo/bin
-    '''
-]
+# [tasks.ci-install-update]
+# description = "Install the `cargo install-update` compiled executable from GitHub releases."
+# # condition_script = ['test ! -f "$HOME/.cargo/bin/cargo-install-update"']
+# script = [
+#     '''
+#     LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d"\"")
+#     URL="https://github.com/nabijaczleweli/cargo-update/releases/download/v${LATEST}/cargo-install-update-v${LATEST}.tbz2"
+#     curl -SsL $URL | tar xjvC $HOME/.cargo/bin
+#     '''
+# ]
 
-[tasks.ci-update-all]
-command = "cargo"
-args = ["install-update", "-a"]
-dependencies = ["ci-install-update"]
+# [tasks.ci-update-all]
+# command = "cargo"
+# args = ["install-update", "-a"]
+# dependencies = ["ci-install-update"]
 
 [tasks.ci-setup-sccache]
 env = { "RUSTC_WRAPPER" = "sccache" }
@@ -62,7 +62,7 @@ condition = { env = { "TRAVIS" = "true" } }
 dependencies = [
     'ci-install-sccache',
     'ci-setup-sccache',
-    'ci-update-all'
+    # 'ci-update-all'
 ]
 
 
@@ -71,28 +71,34 @@ dependencies = [
 [tasks.ci-flow]
 env = { "RUSTC_WRAPPER" = "sccache" }
 
-[tasks.coverage]
-alias = "coverage-tarpaulin"
-
-[tasks.coverage-tarpaulin]
-args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
+[tasks.pre-coverage]
+dependencies = ["ci-setup-tarpaulin"]
 
 [tasks.ci-setup-tarpaulin]
 condition = { env = { "TRAVIS" = "true" } }
-condition_script = ['test ! -f $HOME/.cargo/bin/cargo-tarpaulin']
 script = [
     '''
-    LATEST=$(cargo search cargo-tarpaulin | grep cargo-tarpaulin | cut -f2 -d"\"")
+    LATEST=$(cargo search -q cargo-tarpaulin | grep cargo-tarpaulin | cut -f2 -d"\"")
     URL="https://github.com/xd009642/tarpaulin/releases/download/${LATEST}/cargo-tarpaulin-${LATEST}-travis.tar.gz"
     curl -SsL $URL | tar xzvC $HOME/.cargo/bin
     '''
 ]
 
-[tasks.pre-coverage]
-dependencies = ["ci-setup-tarpaulin"]
+[tasks.coverage]
+alias = "ci-coverage"
+
+[tasks.ci-coverage]
+command = "cargo"
+args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
 
 [tasks.post-ci-flow]
 dependencies = ["audit"]
+
+[tasks.build-verbose]
+alias = "build"
+
+[tasks.test-verbose]
+alias = "test"
 
 
 ### Release flow ###############################################################

@@ -21,7 +21,7 @@ env:
   - SCCACHE_DIR="$HOME/.cargo/sccache"
 
 before_install:
-  - ci/install-cargo-make.sh
+  - sh -x ci/install-cargo-make.sh
   - cargo make ci-setup-flow
 
 script:
