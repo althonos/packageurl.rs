@@ -15,7 +15,7 @@ INSTALLED=$(_installed cargo make)
 LATEST=$(_latest cargo-make)
 echo "${LATEST} (installed: ${INSTALLED})"
 
-if [ "$INSTALLED" == "$LATEST" ]; then
+if [ "$INSTALLED" = "$LATEST" ]; then
   echo "Using cached 'cargo-make'"
 else
   # echo "Installing 'cargo-make' ${LATEST}"
