@@ -74,6 +74,9 @@ env = { "RUSTC_WRAPPER" = "sccache" }
 [tasks.coverage]
 alias = "coverage-tarpaulin"
 
+[tasks.coverage-tarpaulin]
+args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
+
 [tasks.ci-setup-tarpaulin]
 condition = { env = { "TRAVIS" = "true" } }
 condition_script = ['test ! -f $HOME/.cargo/bin/cargo-tarpaulin']
