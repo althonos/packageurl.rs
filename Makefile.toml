@@ -36,22 +36,6 @@ script = [
     '''
 ]
 
-# [tasks.ci-install-update]
-# description = "Install the `cargo install-update` compiled executable from GitHub releases."
-# # condition_script = ['test ! -f "$HOME/.cargo/bin/cargo-install-update"']
-# script = [
-#     '''
-#     LATEST=$(cargo search cargo-update | grep cargo-update | cut -f2 -d"\"")
-#     URL="https://github.com/nabijaczleweli/cargo-update/releases/download/v${LATEST}/cargo-install-update-v${LATEST}.tbz2"
-#     curl -SsL $URL | tar xjvC $HOME/.cargo/bin
-#     '''
-# ]
-
-# [tasks.ci-update-all]
-# command = "cargo"
-# args = ["install-update", "-a"]
-# dependencies = ["ci-install-update"]
-
 [tasks.ci-setup-sccache]
 env = { "RUSTC_WRAPPER" = "sccache" }
 condition_script = ['test ! -d "$SCCACHE_DIR"']
@@ -62,7 +46,6 @@ condition = { env = { "TRAVIS" = "true" } }
 dependencies = [
     'ci-install-sccache',
     'ci-setup-sccache',
-    # 'ci-update-all'
 ]
 
 
