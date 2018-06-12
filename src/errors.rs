@@ -4,13 +4,21 @@
 
 error_chain! {
     errors {
+        InvalidScheme(s: String) {
+            description("invalid scheme")
+            display("invalid scheme: '{}'", s)
+        }
         MissingName {
             description("missing name")
-            display("missing scheme")
+            display("missing name")
         }
         MissingScheme {
             description("missing scheme")
             display("missing scheme")
+        }
+        MissingType {
+            description("missing type")
+            display("missing type")
         }
     }
 }

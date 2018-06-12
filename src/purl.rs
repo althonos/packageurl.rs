@@ -1,20 +1,19 @@
-use ::std::borrow::Cow;
-use ::std::str::FromStr;
-use ::std::string::ToString;
-use ::std::collections::HashMap;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::str::FromStr;
+use std::string::ToString;
 
-use ::percent_encoding::USERINFO_ENCODE_SET;
+use percent_encoding::USERINFO_ENCODE_SET;
 
-use super::parser;
 use super::errors;
+use super::parser;
 use super::utils::PercentCodec;
-
 
 /// A Package URL.
 #[derive(Debug, Clone)]
 pub struct PackageUrl<'a> {
-    /// The package URL scheme (its *type*).
-    pub scheme: Cow<'a, str>,
+    /// The package URL type.
+    pub ty: Cow<'a, str>,
     /// The optional namespace
     pub namespace: Option<Cow<'a, str>>,
     /// The package name.
@@ -27,17 +26,15 @@ pub struct PackageUrl<'a> {
     pub subpath: Option<Cow<'a, str>>,
 }
 
-
 impl<'a> PackageUrl<'a> {
-
-    /// Create a new Package URL with the provided scheme and name.
-    pub fn new<S, N>(scheme: S, name: N) -> Self
+    /// Create a new Package URL with the provided type and name.
+    pub fn new<T, N>(ty: T, name: N) -> Self
     where
-        S: Into<Cow<'a, str>>,
+        T: Into<Cow<'a, str>>,
         N: Into<Cow<'a, str>>,
     {
         Self {
-            scheme: scheme.into(),
+            ty: ty.into(),
             namespace: None,
             name: name.into(),
             version: None,
@@ -49,7 +46,7 @@ impl<'a> PackageUrl<'a> {
     /// Assign a namespace to the package.
     pub fn with_namespace<N>(&mut self, namespace: N) -> &mut Self
     where
-        N: Into<Cow<'a, str>>
+        N: Into<Cow<'a, str>>,
     {
         self.namespace = Some(namespace.into());
         self
@@ -58,7 +55,7 @@ impl<'a> PackageUrl<'a> {
     /// Assign a version to the package.
     pub fn with_version<V>(&mut self, version: V) -> &mut Self
     where
-        V: Into<Cow<'a, str>>
+        V: Into<Cow<'a, str>>,
     {
         self.version = Some(version.into());
         self
@@ -67,7 +64,7 @@ impl<'a> PackageUrl<'a> {
     /// Assign a subpath to the package.
     pub fn with_subpath<S>(&mut self, subpath: S) -> &mut Self
     where
-        S: Into<Cow<'a, str>>
+        S: Into<Cow<'a, str>>,
     {
         self.subpath = Some(subpath.into());
         self
@@ -82,7 +79,6 @@ impl<'a> PackageUrl<'a> {
         self.qualifiers.insert(key.into(), value.into());
         self
     }
-
 }
 
 impl FromStr for PackageUrl<'static> {
@@ -90,15 +86,16 @@ impl FromStr for PackageUrl<'static> {
 
     fn from_str(s: &str) -> errors::Result<Self> {
         // Parse all components into strings (since we don't know infer from `s` lifetime)
+        let (s, _) = parser::owned::parse_scheme(s)?;
         let (s, subpath) = parser::owned::parse_subpath(s)?;
         let (s, ql) = parser::owned::parse_qualifiers(s)?;
         let (s, version) = parser::owned::parse_version(s)?;
-        let (s, scheme) = parser::owned::parse_scheme(s)?;
+        let (s, ty) = parser::owned::parse_type(s)?;
         let (s, mut name) = parser::owned::parse_name(s)?;
         let (_, mut namespace) = parser::owned::parse_namespace(s)?;
 
-        // Special rules for some schemes
-        match scheme.as_ref() {
+        // Special rules for some types
+        match ty.as_ref() {
             "bitbucket" | "github" => {
                 name = name.to_lowercase().into();
                 namespace = namespace.map(|ns| ns.to_lowercase().into());
@@ -109,25 +106,36 @@ impl FromStr for PackageUrl<'static> {
             _ => {}
         };
 
-        let mut purl = Self::new(scheme, name);
-        if let Some(ns) = namespace { purl.with_namespace(ns); }
-        if let Some(v) = version { purl.with_version(v); }
-        if let Some(sp) = subpath { purl.with_subpath(sp); }
-        for (k, v) in ql.into_iter() { purl.add_qualifier(k, v); }
+        let mut purl = Self::new(ty, name);
+        if let Some(ns) = namespace {
+            purl.with_namespace(ns);
+        }
+        if let Some(v) = version {
+            purl.with_version(v);
+        }
+        if let Some(sp) = subpath {
+            purl.with_subpath(sp);
+        }
+        for (k, v) in ql.into_iter() {
+            purl.add_qualifier(k, v);
+        }
 
         // The obtained package url
         Ok(purl)
     }
-
 }
 
 impl<'a> ToString for PackageUrl<'a> {
     fn to_string(&self) -> String {
         let mut url = String::new();
 
-        // Scheme: no encoding needed
-        url.push_str(&self.scheme);
+        // Scheme: constant
+        url.push_str("pkg");
         url.push(':');
+
+        // Type: no encoding needed
+        url.push_str(&self.ty);
+        url.push('/');
 
         // Namespace: percent-encode each component
         if let Some(ref ns) = self.namespace {
@@ -141,7 +149,9 @@ impl<'a> ToString for PackageUrl<'a> {
         }
 
         // Name: percent-encode the name
-        self.name.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
+        self.name
+            .encode(USERINFO_ENCODE_SET)
+            .for_each(|s| url.push_str(s));
 
         // Version: percent-encode the version
         if let Some(ref v) = self.version {
@@ -172,7 +182,10 @@ impl<'a> ToString for PackageUrl<'a> {
             url.push('#');
             let components = sp
                 .split('/')
-                .filter(|&s| match s {"" | "." | ".." => false, _ => true})
+                .filter(|&s| match s {
+                    "" | "." | ".." => false,
+                    _ => true,
+                })
                 .map(|s| s.encode(USERINFO_ENCODE_SET));
             let ref mut it = components.peekable();
             while let Some(component) = it.next() {
@@ -187,7 +200,6 @@ impl<'a> ToString for PackageUrl<'a> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
 
@@ -195,9 +207,9 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        let raw_purl = "type:name/space/name@version?k1=v1&k2=v2#sub/path";
+        let raw_purl = "pkg:type/name/space/name@version?k1=v1&k2=v2#sub/path";
         let purl = PackageUrl::from_str(raw_purl).unwrap();
-        assert_eq!(purl.scheme, "type");
+        assert_eq!(purl.ty, "type");
         assert_eq!(purl.namespace, Some(Cow::Borrowed("name/space")));
         assert_eq!(purl.name, "name");
         assert_eq!(purl.version, Some(Cow::Borrowed("version")));
@@ -208,7 +220,7 @@ mod tests {
 
     #[test]
     fn test_to_str() {
-        let canonical = "type:name/space/name@version?k1=v1&k2=v2#sub/path";
+        let canonical = "pkg:type/name/space/name@version?k1=v1&k2=v2#sub/path";
         let purl_string = PackageUrl::new("type", "name")
             .with_namespace("name/space")
             .with_version("version")

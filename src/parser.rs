@@ -5,7 +5,19 @@ pub mod owned {
 
     use super::errors;
     use super::utils;
-    use utils::{QuickFind, JoinableIterator, PercentCodec};
+    use utils::{JoinableIterator, PercentCodec, QuickFind};
+
+    pub fn parse_scheme<'a>(input: &str) -> errors::Result<(&str, String)> {
+        if let Some(i) = input.quickfind(b':') {
+            if &input[..i] == "pkg" {
+                Ok((&input[i + 1..], input[..i].to_string()))
+            } else {
+                bail!(errors::ErrorKind::InvalidScheme(input[..i].to_string()))
+            }
+        } else {
+            bail!(errors::ErrorKind::MissingScheme)
+        }
+    }
 
     pub fn parse_subpath<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {
         if let Some(i) = input.quickrfind(b'#') {
@@ -43,11 +55,11 @@ pub mod owned {
         }
     }
 
-    pub fn parse_scheme<'a>(input: &str) -> errors::Result<(&str, String)> {
-        if let Some(i) = input.quickfind(b':') {
+    pub fn parse_type<'a>(input: &str) -> errors::Result<(&str, String)> {
+        if let Some(i) = input.quickfind(b'/') {
             Ok((&input[i + 1..], input[..i].to_lowercase().into()))
         } else {
-            bail!(errors::ErrorKind::MissingScheme)
+            bail!(errors::ErrorKind::MissingType)
         }
     }
 
