@@ -11,7 +11,7 @@
 //! use std::str::FromStr;
 //! use packageurl::PackageUrl;
 //!
-//! let purl = PackageUrl::from_str("npm:%40angular/animation@12.3.1").unwrap();
+//! let purl = PackageUrl::from_str("pkg:npm/%40angular/animation@12.3.1").unwrap();
 //! assert!(purl.name == "animation");
 //! assert!(purl.namespace.unwrap() == "@angular");
 //! ```
@@ -40,9 +40,9 @@ extern crate memchr;
 extern crate error_chain;
 extern crate percent_encoding;
 
-mod parser;
-mod utils;
-mod purl;
 pub mod errors;
+mod parser;
+mod purl;
+mod utils;
 
 pub use purl::PackageUrl;

@@ -27,7 +27,7 @@ impl<'a> SpecTestCase<'a> {
                 .unwrap();
             ::serde_json::from_value(json).unwrap()
         } else {
-            unreachable!()
+            unreachable!("invalid json file")
         }
     }
 }
