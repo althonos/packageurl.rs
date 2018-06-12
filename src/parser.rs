@@ -10,7 +10,13 @@ pub mod owned {
     pub fn parse_scheme<'a>(input: &str) -> errors::Result<(&str, String)> {
         if let Some(i) = input.quickfind(b':') {
             if &input[..i] == "pkg" {
-                Ok((&input[i + 1..], input[..i].to_string()))
+                let mut j = i + 1;
+                let mut it = input[i + 1..].chars();
+                while let Some('/') = it.next() {
+                    j += 1;
+                }
+
+                Ok((&input[j..], input[..i].to_string()))
             } else {
                 bail!(errors::ErrorKind::InvalidScheme(input[..i].to_string()))
             }
