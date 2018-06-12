@@ -33,7 +33,7 @@ extern crate packageurl
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
-let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.1.0")
+let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.2.0")
 ```
 
 Generate a canonical PURL using the
@@ -45,7 +45,7 @@ use std::string::ToString;
 use package::PackageUrl;
 
 let canonical = PackageUrl::new("cargo", "packageurl")
-    .with_version("0.1.0")
+    .with_version("0.2.0")
     .to_string();
 ```
 

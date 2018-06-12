@@ -55,27 +55,32 @@ dependencies = [
 env = { "RUSTC_WRAPPER" = "sccache" }
 
 [tasks.pre-coverage]
-dependencies = ["ci-setup-tarpaulin"]
+alias = "ci-setup-tarpaulin"
 
 [tasks.ci-setup-tarpaulin]
-condition = { env = { "TRAVIS" = "true" } }
-script = [
-    '''
-    LATEST=$(cargo search -q cargo-tarpaulin | grep cargo-tarpaulin | cut -f2 -d"\"")
-    URL="https://github.com/xd009642/tarpaulin/releases/download/${LATEST}/cargo-tarpaulin-${LATEST}-travis.tar.gz"
-    curl -SsL $URL | tar xzvC $HOME/.cargo/bin
-    '''
-]
+condition = { env = { "TRAVIS_RUST_VERSION" = "nightly" } }
+env = { "RUSTFLAGS" = "--cfg procmacro2_semver_exempt" }
+command = "cargo"
+args = ["install", "-f", "cargo-tarpaulin"]
+#script = [
+#    '''
+#    LATEST=$(cargo search -q cargo-tarpaulin | grep cargo-tarpaulin | cut -f2 -d"\"")
+#    URL="https://github.com/xd009642/tarpaulin/releases/download/${LATEST}/cargo-tarpaulin-${LATEST}-travis.tar.gz"
+#    curl -SsL $URL | tar xzvC $HOME/.cargo/bin
+#    '''
+#]
 
 [tasks.coverage]
 alias = "ci-coverage"
 
 [tasks.ci-coverage]
+condition = { env = { "TRAVIS_RUST_VERSION" = "nightly" } }
+install_crate = "cargo-tarpaulin"
 command = "cargo"
 args = ["tarpaulin", "--out=Xml", "--ciserver=travis-ci"]
 
 [tasks.post-ci-flow]
-dependencies = ["audit"]
+alias = "audit"
 
 [tasks.build-verbose]
 alias = "build"
