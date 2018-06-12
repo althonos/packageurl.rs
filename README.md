@@ -22,7 +22,7 @@ Add this crate to the `Cargo.toml`:
 
 ```toml
 [dependencies]
-packageurl = "^0.1.0"
+packageurl = "^0.2.0"
 ```
 
 Parse a string containing a raw PURL using the
@@ -33,7 +33,7 @@ extern crate packageurl
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
-let purl = PackageUrl::from_str("cargo:packageurl@0.1.0")
+let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.1.0")
 ```
 
 Generate a canonical PURL using the
