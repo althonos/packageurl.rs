@@ -1,11 +1,10 @@
 macro_rules! spec_tests {
-    ($name:ident, $desc: expr) => {
-
+    ($name:ident, $desc:expr) => {
         mod $name {
 
-            use ::std::str::FromStr;
-            use ::packageurl::PackageUrl;
             use super::testcase::SpecTestCase;
+            use packageurl::PackageUrl;
+            use std::str::FromStr;
 
             lazy_static! {
                 static ref TEST_CASE: SpecTestCase<'static> = SpecTestCase::new($desc);
@@ -15,7 +14,7 @@ macro_rules! spec_tests {
             fn purl_to_components() {
                 if let Ok(purl) = PackageUrl::from_str(&TEST_CASE.purl) {
                     assert!(!TEST_CASE.is_invalid);
-                    assert_eq!(TEST_CASE.scheme, purl.scheme);
+                    assert_eq!(TEST_CASE.ty, purl.ty);
                     assert_eq!(TEST_CASE.name, purl.name);
                     assert_eq!(TEST_CASE.namespace, purl.namespace);
                     assert_eq!(TEST_CASE.version, purl.version);
@@ -31,12 +30,25 @@ macro_rules! spec_tests {
                 if TEST_CASE.is_invalid {
                     return;
                 }
-                let mut purl = PackageUrl::new(TEST_CASE.scheme.as_ref(), TEST_CASE.name.as_ref());
 
-                if let Some(ref ns) = TEST_CASE.namespace { purl.with_namespace(ns.as_ref()); }
-                if let Some(ref v) = TEST_CASE.version { purl.with_version(v.as_ref()); }
-                if let Some(ref sp) = TEST_CASE.subpath { purl.with_subpath(sp.as_ref()); }
-                for (k, v) in TEST_CASE.qualifiers.iter() { purl.add_qualifier(k.as_ref(), v.as_ref()); }
+                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref(), TEST_CASE.name.as_ref());
+
+                if let Some(ref ns) = TEST_CASE.namespace {
+                    purl.with_namespace(ns.as_ref());
+                }
+
+                if let Some(ref v) = TEST_CASE.version {
+                    purl.with_version(v.as_ref());
+                }
+
+                if let Some(ref sp) = TEST_CASE.subpath {
+                    purl.with_subpath(sp.as_ref());
+                }
+
+                for (k, v) in TEST_CASE.qualifiers.iter() {
+                    purl.add_qualifier(k.as_ref(), v.as_ref());
+                }
+
                 assert_eq!(TEST_CASE.canonical_purl, purl.to_string());
             }
 
@@ -60,6 +72,5 @@ macro_rules! spec_tests {
             }
 
         }
-
-    }
+    };
 }
