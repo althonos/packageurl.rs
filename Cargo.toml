@@ -1,6 +1,6 @@
 [package]
 name = "packageurl"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Martin Larralde <martin.larralde@ens-paris-saclay.fr>"]
 license = "MIT"
 description = "Rust implementation of the package url specification"
