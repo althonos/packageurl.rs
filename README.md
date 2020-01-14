@@ -2,9 +2,9 @@
 
 *Read and generate Package URLs in Rust.*
 
-[![TravisCI](https://img.shields.io/travis/althonos/packageurl-rs/master.svg?maxAge=600&style=flat-square)](https://travis-ci.org/althonos/packageurl-rs/branches)
-[![Codecov](https://img.shields.io/codecov/c/github/althonos/packageurl-rs.svg?maxAge=600&style=flat-square)](https://codecov.io/github/althonos/packageurl-rs)
-[![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square)](https://github.com/althonos/packageurl-rs)
+[![TravisCI](https://img.shields.io/travis/althonos/packageurl.rs/master.svg?maxAge=600&style=flat-square)](https://travis-ci.org/althonos/packageurl.rs/branches)
+[![Codecov](https://img.shields.io/codecov/c/github/althonos/packageurl.rs.svg?maxAge=600&style=flat-square)](https://codecov.io/github/althonos/packageurl.rs)
+[![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square)](https://github.com/althonos/packageurl.rs)
 [![Crate](https://img.shields.io/crates/v/packageurl.svg?maxAge=86400&style=flat-square)](https://crates.io/crates/packageurl)
 [![Documentation](https://img.shields.io/badge/docs-latest-4d76ae.svg?maxAge=86400&style=flat-square)](https://docs.rs/packageurl)
 [![CargoMake](https://img.shields.io/badge/built%20with-cargo--make-yellow.svg?maxAge=86400&style=flat-square)](https://sagiegurari.github.io/cargo-make)
