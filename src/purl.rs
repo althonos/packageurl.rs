@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::fmt;
 use std::str::FromStr;
-use std::string::ToString;
 
 use percent_encoding::USERINFO_ENCODE_SET;
 
@@ -125,79 +125,85 @@ impl FromStr for PackageUrl<'static> {
     }
 }
 
-impl<'a> ToString for PackageUrl<'a> {
-    fn to_string(&self) -> String {
-        let mut url = String::new();
-
+impl fmt::Display for PackageUrl<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Scheme: constant
-        url.push_str("pkg");
-        url.push(':');
+        write!(f, "pkg:")?;
 
         // Type: no encoding needed
-        url.push_str(&self.ty);
-        url.push('/');
+        write!(f, "{}/", self.ty)?;
 
         // Namespace: percent-encode each component
         if let Some(ref ns) = self.namespace {
-            ns.split('/')
+            for component in ns
+                .split('/')
                 .filter(|s| !s.is_empty())
                 .map(|s| s.encode(USERINFO_ENCODE_SET))
-                .for_each(|pe| {
-                    pe.for_each(|s| url.push_str(s));
-                    url.push('/')
-                });
+            {
+                write!(f, "{}/", component)?;
+            }
         }
 
         // Name: percent-encode the name
-        self.name
-            .encode(USERINFO_ENCODE_SET)
-            .for_each(|s| url.push_str(s));
+        write!(f, "{}", self.name.encode(USERINFO_ENCODE_SET))?;
 
         // Version: percent-encode the version
         if let Some(ref v) = self.version {
-            url.push('@');
-            v.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
+            write!(f, "@{}", v.encode(USERINFO_ENCODE_SET))?;
         }
 
         // Qualifiers: percent-encode the values
         if !self.qualifiers.is_empty() {
-            url.push('?');
+            write!(f, "?")?;
 
             let mut items = self.qualifiers.iter().collect::<Vec<_>>();
             items.sort();
-            let ref mut it = items.iter().peekable();
 
-            while let Some(&(k, v)) = it.next() {
-                url.push_str(&k);
-                url.push('=');
-                &v.encode(USERINFO_ENCODE_SET).for_each(|s| url.push_str(s));
-                if it.peek().is_some() {
-                    url.push('&')
-                };
-            }
+            fmt_delimited(
+                items
+                    .into_iter()
+                    .map(|(k, v)| format!("{}={}", k, v.encode(USERINFO_ENCODE_SET))),
+                "&",
+                f,
+            )?;
         }
 
         // Subpath: percent-encode the components
         if let Some(ref sp) = self.subpath {
-            url.push('#');
-            let components = sp
-                .split('/')
-                .filter(|&s| match s {
-                    "" | "." | ".." => false,
-                    _ => true,
-                })
-                .map(|s| s.encode(USERINFO_ENCODE_SET));
-            let ref mut it = components.peekable();
-            while let Some(component) = it.next() {
-                component.for_each(|s| url.push_str(s));
-                if it.peek().is_some() {
-                    url.push('/')
-                }
-            }
+            write!(f, "#")?;
+            fmt_delimited(
+                sp.split('/')
+                    .filter(|&s| match s {
+                        "" | "." | ".." => false,
+                        _ => true,
+                    })
+                    .map(|s| s.encode(USERINFO_ENCODE_SET)),
+                "/",
+                f,
+            )?;
         }
 
-        url
+        Ok(())
     }
+}
+
+fn fmt_delimited<T: fmt::Display>(
+    values: impl IntoIterator<Item = T>,
+    delimiter: &str,
+    formatter: &mut fmt::Formatter,
+) -> fmt::Result {
+    let mut seen_first = false;
+    for value in values {
+        if seen_first {
+            write!(formatter, "{}", delimiter)?;
+        } else {
+            seen_first = true;
+        }
+
+        write!(formatter, "{}", value)?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -230,5 +236,4 @@ mod tests {
             .to_string();
         assert_eq!(&purl_string, canonical);
     }
-
 }
