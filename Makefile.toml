@@ -19,7 +19,7 @@ description = "Runs the American Fuzzy Lop fuzzer on the library."
 dependencies = ["build-afl"]
 install_crate = "afl"
 command = "cargo"
-args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/afl"]
+args = ["afl", "fuzz", "-i", "afl/in", "-o", "afl/out", "afl/target/release/packageurl-fuzz"]
 
 
 ### CI setup flow ##############################################################

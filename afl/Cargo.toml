@@ -1,8 +1,9 @@
 [package]
-name = "afl"
+name = "packageurl-fuzz"
 version = "0.1.0"
-authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
+authors = ["Martin Larralde <martin.larralde@embl.de>"]
+publish = false
 
 [dependencies]
-afl = "*"
-packageurl = { version = "*", path = ".." }
+afl = "0.10.1"
+packageurl = { path = ".." }
