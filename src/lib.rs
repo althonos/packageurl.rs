@@ -23,7 +23,7 @@
 //! use packageurl::PackageUrl;
 //!
 //! let err = PackageUrl::from_str("package@0.1.0").unwrap_err();
-//! assert!(err.description() == "missing scheme");
+//! assert!(err.to_string() == "missing scheme");
 //! ```
 //!
 //! The parsed [`PackageUrl`] will have a [`'static`] lifetime, so that the parsed string can be
@@ -37,7 +37,7 @@
 #[cfg(feature = "memchr")]
 extern crate memchr;
 #[macro_use]
-extern crate error_chain;
+extern crate thiserror;
 extern crate percent_encoding;
 
 pub mod errors;

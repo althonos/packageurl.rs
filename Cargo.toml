@@ -12,8 +12,8 @@ categories = ["parser-implementations", "encoding", "development-tools"]
 
 [dependencies]
 percent-encoding = "^1.0.0"
-error-chain = "^0.7.1"
-memchr = { version = "^2.0.0", optional = true}
+thiserror = "1.0.0"
+memchr = { version = "2.4.0", optional = true}
 
 [dev-dependencies]
 serde = "^1.0.37"
@@ -21,8 +21,3 @@ serde_derive = "^1.0.37"
 serde_json = "^1.0.13"
 lazy_static = "^1.0.0"
 url = "^1.7.0"
-
-[badges]
-travis-ci   = { repository = "althonos/packageurl-rs" }
-codecov     = { repository = "althonos/packageurl-rs" }
-maintenance = { status = "actively-developed" }

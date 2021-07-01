@@ -18,10 +18,10 @@ pub mod owned {
 
                 Ok((&input[j..], input[..i].to_string()))
             } else {
-                bail!(errors::ErrorKind::InvalidScheme(input[..i].to_string()))
+                Err(errors::Error::InvalidScheme(input[..i].to_string()))
             }
         } else {
-            bail!(errors::ErrorKind::MissingScheme)
+            Err(errors::Error::MissingScheme)
         }
     }
 
@@ -65,20 +65,18 @@ pub mod owned {
         if let Some(i) = input.quickfind(b'/') {
             Ok((&input[i + 1..], input[..i].to_lowercase().into()))
         } else {
-            bail!(errors::ErrorKind::MissingType)
+            Err(errors::Error::MissingType)
         }
     }
 
     pub fn parse_name<'a>(input: &str) -> errors::Result<(&str, String)> {
         let (rem, name) = utils::rcut(input.trim_matches('/'), b'/');
-
-        let canonical_name = if name.is_empty() {
-            bail!(errors::ErrorKind::MissingName)
+        if name.is_empty() {
+            Err(errors::Error::MissingName)
         } else {
-            name.decode().decode_utf8_lossy().to_string()
-        };
-
-        Ok((rem, canonical_name))
+            let canonical_name = name.decode().decode_utf8_lossy().to_string();
+            Ok((rem, canonical_name))
+        }
     }
 
     pub fn parse_namespace<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {

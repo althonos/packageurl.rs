@@ -2,23 +2,16 @@
 //!
 //! [`error-chain`]: https://docs.rs/error-chain/
 
-error_chain! {
-    errors {
-        InvalidScheme(s: String) {
-            description("invalid scheme")
-            display("invalid scheme: '{}'", s)
-        }
-        MissingName {
-            description("missing name")
-            display("missing name")
-        }
-        MissingScheme {
-            description("missing scheme")
-            display("missing scheme")
-        }
-        MissingType {
-            description("missing type")
-            display("missing type")
-        }
-    }
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("invalid scheme: {0:?}")]
+    InvalidScheme(String),
+    #[error("missing name")]
+    MissingName,
+    #[error("missing scheme")]
+    MissingScheme,
+    #[error("missing type")]
+    MissingType,
 }
+
+pub type Result<T> = std::result::Result<T, Error>;
