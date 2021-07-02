@@ -1,28 +1,28 @@
-# `packageurl`
+# `packageurl-rs` [![Star me](https://img.shields.io/github/stars/althonos/packageurl-rs.svg?style=social&label=Star&maxAge=3600)](https://github.com/althonos/packageurl-rs/stargazers)
 
 *Read and generate Package URLs in Rust.*
 
-[![TravisCI](https://img.shields.io/travis/althonos/packageurl.rs/master.svg?maxAge=600&style=flat-square)](https://travis-ci.org/althonos/packageurl.rs/branches)
+[![Actions](https://img.shields.io/github/checks-status/althonos/packageurl-rs/master?maxAge=600&style=flat-square)](https://github.com/althonos/packageurl.rs/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/althonos/packageurl.rs.svg?maxAge=600&style=flat-square)](https://codecov.io/github/althonos/packageurl.rs)
 [![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square)](https://github.com/althonos/packageurl.rs)
 [![Crate](https://img.shields.io/crates/v/packageurl.svg?maxAge=86400&style=flat-square)](https://crates.io/crates/packageurl)
 [![Documentation](https://img.shields.io/badge/docs-latest-4d76ae.svg?maxAge=86400&style=flat-square)](https://docs.rs/packageurl)
 [![CargoMake](https://img.shields.io/badge/built%20with-cargo--make-yellow.svg?maxAge=86400&style=flat-square)](https://sagiegurari.github.io/cargo-make)
 [![Changelog](https://img.shields.io/badge/keep%20a-changelog-8A0707.svg?maxAge=86400&style=flat-square)](http://keepachangelog.com/)
-[![SayThanks](https://img.shields.io/badge/say-thanks!-1EAEDB.svg?maxAge=86400&style=flat-square)](https://saythanks.io/to/althonos)
+[![GitHub issues](https://img.shields.io/github/issues/althonos/packageurl-rs.svg?style=flat-square&maxAge=600)](https://github.com/althonos/packageurl-rs/issues)
 
 ## About
 
 This crate is an implementation of the [Package URL](https://github.com/package-url/purl-spec)
 specification for the [Rust](http://rust-lang.org/) programming language.
 
-## Usage
+## 🔌 Usage
 
 Add this crate to the `Cargo.toml`:
 
 ```toml
 [dependencies]
-packageurl = "^0.2.0"
+packageurl = "0.3.0"
 ```
 
 Parse a string containing a raw PURL using the
@@ -33,27 +33,53 @@ extern crate packageurl
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
-let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.2.0")
+let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.3.0");
 ```
 
-Generate a canonical PURL using the
-[`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html) trait:
+Creating a PURL from Rust and then generating a string representation using:
+the [`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html) trait:
 
 ```rust
 extern crate packageurl;
 use std::string::ToString;
-use package::PackageUrl;
 
-let canonical = PackageUrl::new("cargo", "packageurl")
-    .with_version("0.2.0")
+let canonical = package::PackageUrl::new("cargo", "packageurl")
+    .expect("only fails if type is invalid")
+    .with_version("0.3.0")
     .to_string();
+```
+
+`serde` serialization and deserialization is also supported, provided the
+`serde` feature is enabled:
+```toml
+[dependencies]
+packageurl = { version = "0.3.0", features = ["serde"] }
 ```
 
 See more in the [online documentation](https://docs.rs/packageurl/).
 
+## 📝 Features
 
-## Note
+- `memchr`: use the [`memchr`](https://docs.rs/memchr/) crate to locate
+  separator when parsing.
+- `serde`: enable serialization and deserialization support with the
+  [`serde`](https://docs.rs/serde) crate.
 
-The specification is not completely enforced right now: in particular, it will
-allow building Package URLs with invalid namespaces and the like. More validations
-and errors are to be added in the future.
+## 📋 Changelog
+
+This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
+and provides a [changelog](https://github.com/althonos/packageurl-rs/blob/master/CHANGELOG.md)
+in the [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) format.
+
+## 💭 Feedback
+
+Found a bug ? Have an enhancement request ? Head over to the
+[GitHub issue tracker](https://github.com/althonos/packageurl-rs/issues) of the project if
+you need to report or ask something. If you are filling in on a bug, please include as much
+information as you can about the issue, and try to recreate the same bug in a simple, easily
+reproducible situation.
+
+## ⚖️ License
+
+This library is provided under the open-source
+[MIT license](https://choosealicense.com/licenses/mit/).
