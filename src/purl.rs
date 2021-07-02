@@ -37,7 +37,7 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     .add(b'|');
 
 /// A Package URL.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PackageUrl<'a> {
     /// The package URL type.
@@ -290,8 +290,6 @@ impl Display for PackageUrl<'_> {
 }
 
 
-
-
 #[cfg(test)]
 mod tests {
 
@@ -337,7 +335,7 @@ mod tests {
         let j = serde_json::to_string(&purl).unwrap();
         let purl2: PackageUrl = serde_json::from_str(&j).unwrap();
 
-        // assert_eq!(purl, purl2);
+        assert_eq!(purl, purl2);
 
     }
 }
