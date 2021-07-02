@@ -19,8 +19,8 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     .add(b'?')
     .add(b'{')
     .add(b'}')
-    .add(b'/')
-    .add(b':')
+    // .add(b'/')
+    // .add(b':')
     .add(b';')
     .add(b'=')
     .add(b'@')
@@ -107,13 +107,13 @@ impl FromStr for PackageUrl<'static> {
 
     fn from_str(s: &str) -> errors::Result<Self> {
         // Parse all components into strings (since we don't know infer from `s` lifetime)
-        let (s, _) = parser::owned::parse_scheme(s)?;
-        let (s, subpath) = parser::owned::parse_subpath(s)?;
-        let (s, ql) = parser::owned::parse_qualifiers(s)?;
-        let (s, version) = parser::owned::parse_version(s)?;
-        let (s, ty) = parser::owned::parse_type(s)?;
-        let (s, mut name) = parser::owned::parse_name(s)?;
-        let (_, mut namespace) = parser::owned::parse_namespace(s)?;
+        let (s, _) = parser::parse_scheme(s)?;
+        let (s, subpath) = parser::parse_subpath(s)?;
+        let (s, ql) = parser::parse_qualifiers(s)?;
+        let (s, version) = parser::parse_version(s)?;
+        let (s, ty) = parser::parse_type(s)?;
+        let (s, mut name) = parser::parse_name(s)?;
+        let (_, mut namespace) = parser::parse_namespace(s)?;
 
         // Special rules for some types
         match ty.as_ref() {

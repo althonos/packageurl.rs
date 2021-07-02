@@ -45,6 +45,7 @@ mod errors;
 mod parser;
 mod purl;
 mod utils;
+mod validation;
 
 pub use errors::Error;
 pub use errors::Result;

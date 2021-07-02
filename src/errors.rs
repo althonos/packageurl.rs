@@ -6,6 +6,8 @@
 pub enum Error {
     #[error("invalid scheme: {0:?}")]
     InvalidScheme(String),
+    #[error("invalid key: {0:?}")]
+    InvalidKey(String),
     #[error("missing name")]
     MissingName,
     #[error("missing scheme")]
