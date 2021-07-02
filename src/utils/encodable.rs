@@ -1,14 +1,14 @@
-use ::percent_encoding::EncodeSet;
-use ::percent_encoding::PercentEncode;
-use ::percent_encoding::PercentDecode;
+use percent_encoding::AsciiSet;
+use percent_encoding::PercentDecode;
+use percent_encoding::PercentEncode;
 
 pub trait PercentCodec {
-    fn encode<E: EncodeSet>(&self, encode_set: E) -> PercentEncode<E>;
+    fn encode(&self, encode_set: &'static AsciiSet) -> PercentEncode;
     fn decode(&self) -> PercentDecode;
 }
 
 impl PercentCodec for [u8] {
-    fn encode<E: EncodeSet>(&self, encode_set: E) -> PercentEncode<E> {
+    fn encode(&self, encode_set: &'static AsciiSet) -> PercentEncode {
         ::percent_encoding::percent_encode(self, encode_set)
     }
     fn decode(&self) -> PercentDecode {
@@ -17,7 +17,7 @@ impl PercentCodec for [u8] {
 }
 
 impl PercentCodec for str {
-    fn encode<E: EncodeSet>(&self, encode_set: E) -> PercentEncode<E> {
+    fn encode(&self, encode_set: &'static AsciiSet) -> PercentEncode {
         self.as_bytes().encode(encode_set)
     }
     fn decode(&self) -> PercentDecode {
@@ -26,7 +26,7 @@ impl PercentCodec for str {
 }
 
 impl<'a> PercentCodec for ::std::borrow::Cow<'a, str> {
-    fn encode<E: EncodeSet>(&self, encode_set: E) -> PercentEncode<E> {
+    fn encode<'s>(&self, encode_set: &'static AsciiSet) -> PercentEncode {
         self.as_bytes().encode(encode_set)
     }
     fn decode(&self) -> PercentDecode {

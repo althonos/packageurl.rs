@@ -3,11 +3,32 @@ use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
 
-use percent_encoding::USERINFO_ENCODE_SET;
+use percent_encoding::AsciiSet;
 
 use super::errors;
 use super::parser;
 use super::utils::PercentCodec;
+
+const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
+    .add(b' ')
+    .add(b'"')
+    .add(b'#')
+    .add(b'<')
+    .add(b'>')
+    .add(b'`')
+    .add(b'?')
+    .add(b'{')
+    .add(b'}')
+    .add(b'/')
+    .add(b':')
+    .add(b';')
+    .add(b'=')
+    .add(b'@')
+    .add(b'\\')
+    .add(b'[')
+    .add(b']')
+    .add(b'^')
+    .add(b'|');
 
 /// A Package URL.
 #[derive(Debug, Clone)]
@@ -138,18 +159,18 @@ impl fmt::Display for PackageUrl<'_> {
             for component in ns
                 .split('/')
                 .filter(|s| !s.is_empty())
-                .map(|s| s.encode(USERINFO_ENCODE_SET))
+                .map(|s| s.encode(ENCODE_SET))
             {
                 write!(f, "{}/", component)?;
             }
         }
 
         // Name: percent-encode the name
-        write!(f, "{}", self.name.encode(USERINFO_ENCODE_SET))?;
+        write!(f, "{}", self.name.encode(ENCODE_SET))?;
 
         // Version: percent-encode the version
         if let Some(ref v) = self.version {
-            write!(f, "@{}", v.encode(USERINFO_ENCODE_SET))?;
+            write!(f, "@{}", v.encode(ENCODE_SET))?;
         }
 
         // Qualifiers: percent-encode the values
@@ -162,7 +183,7 @@ impl fmt::Display for PackageUrl<'_> {
             fmt_delimited(
                 items
                     .into_iter()
-                    .map(|(k, v)| format!("{}={}", k, v.encode(USERINFO_ENCODE_SET))),
+                    .map(|(k, v)| format!("{}={}", k, v.encode(ENCODE_SET))),
                 "&",
                 f,
             )?;
@@ -177,7 +198,7 @@ impl fmt::Display for PackageUrl<'_> {
                         "" | "." | ".." => false,
                         _ => true,
                     })
-                    .map(|s| s.encode(USERINFO_ENCODE_SET)),
+                    .map(|s| s.encode(ENCODE_SET)),
                 "/",
                 f,
             )?;
