@@ -13,11 +13,11 @@ categories = ["parser-implementations", "encoding", "development-tools"]
 [dependencies]
 percent-encoding = "2.1.0"
 thiserror = "1.0.0"
-memchr = { version = "2.4.0", optional = true}
+memchr = { version = "2.4.0", optional = true }
+serde = { version = "1.0.0", optional = true }
 
 [dev-dependencies]
-serde = "^1.0.37"
-serde_derive = "^1.0.37"
-serde_json = "^1.0.13"
+serde = { version = "1.0.0", features = ["derive"] }
+serde_json = "1.0.13"
 lazy_static = "^1.0.0"
 url = "^1.7.0"

@@ -14,12 +14,16 @@ macro_rules! spec_tests {
             fn purl_to_components() {
                 if let Ok(purl) = PackageUrl::from_str(&TEST_CASE.purl) {
                     assert!(!TEST_CASE.is_invalid);
-                    assert_eq!(TEST_CASE.ty, purl.ty);
-                    assert_eq!(TEST_CASE.name, purl.name);
+                    assert_eq!(TEST_CASE.ty.as_ref().unwrap(), &purl.ty);
+                    assert_eq!(TEST_CASE.name.as_ref().unwrap(), &purl.name);
                     assert_eq!(TEST_CASE.namespace, purl.namespace);
                     assert_eq!(TEST_CASE.version, purl.version);
                     assert_eq!(TEST_CASE.subpath, purl.subpath);
-                    assert_eq!(TEST_CASE.qualifiers, purl.qualifiers);
+                    if let Some(ref quals) = TEST_CASE.qualifiers {
+                        assert_eq!(quals, &purl.qualifiers);
+                    } else {
+                        assert!(purl.qualifiers.is_empty());
+                    }
                 } else {
                     assert!(TEST_CASE.is_invalid);
                 }
@@ -31,7 +35,7 @@ macro_rules! spec_tests {
                     return;
                 }
 
-                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref(), TEST_CASE.name.as_ref());
+                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref().unwrap().clone(), TEST_CASE.name.as_ref().unwrap().clone());
 
                 if let Some(ref ns) = TEST_CASE.namespace {
                     purl.with_namespace(ns.as_ref());
@@ -45,11 +49,13 @@ macro_rules! spec_tests {
                     purl.with_subpath(sp.as_ref());
                 }
 
-                for (k, v) in TEST_CASE.qualifiers.iter() {
-                    purl.add_qualifier(k.as_ref(), v.as_ref());
+                if let Some(ref quals) = TEST_CASE.qualifiers {
+                    for (k, v) in quals.iter() {
+                        purl.add_qualifier(k.as_ref(), v.as_ref());
+                    }
                 }
 
-                assert_eq!(TEST_CASE.canonical_purl, purl.to_string());
+                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string());
             }
 
             #[test]
@@ -58,8 +64,8 @@ macro_rules! spec_tests {
                     return;
                 }
 
-                let purl = PackageUrl::from_str(&TEST_CASE.canonical_purl).unwrap();
-                assert_eq!(TEST_CASE.canonical_purl, purl.to_string());
+                let purl = PackageUrl::from_str(&TEST_CASE.canonical_purl.as_ref().unwrap()).unwrap();
+                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string());
             }
 
             #[test]
@@ -68,7 +74,7 @@ macro_rules! spec_tests {
                     return;
                 }
                 let purl = PackageUrl::from_str(&TEST_CASE.purl).unwrap();
-                assert_eq!(TEST_CASE.canonical_purl, purl.to_string())
+                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string())
             }
 
         }
