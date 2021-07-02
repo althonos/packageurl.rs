@@ -5,7 +5,7 @@ pub mod owned {
 
     use super::errors;
     use super::utils;
-    use utils::{JoinableIterator, PercentCodec, QuickFind};
+    use utils::{PercentCodec, QuickFind};
 
     pub fn parse_scheme<'a>(input: &str) -> errors::Result<(&str, String)> {
         if let Some(i) = input.quickfind(b':') {
@@ -27,12 +27,18 @@ pub mod owned {
 
     pub fn parse_subpath<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {
         if let Some(i) = input.quickrfind(b'#') {
-            let subpath = input[i + 1..]
+            let mut subpath = String::with_capacity(i+1);
+            let mut components = input[i + 1..]
                 .trim_matches('/')
                 .split('/')
-                .filter(|&c| !(c.is_empty() || c == "." || c == ".."))
-                .map(|c| c.as_bytes().decode().decode_utf8_lossy())
-                .join("/");
+                .filter(|&c| !(c.is_empty() || c == "." || c == ".."));
+            if let Some(c) = components.next() {
+                subpath.push_str(&c.decode().decode_utf8()?);
+            }
+            while let Some(c) = components.next() {
+                subpath.push('/');
+                subpath.push_str(&c.decode().decode_utf8()?);
+            }
             Ok((&input[..i], Some(subpath)))
         } else {
             Ok((input, None))
@@ -74,23 +80,28 @@ pub mod owned {
         if name.is_empty() {
             Err(errors::Error::MissingName)
         } else {
-            let canonical_name = name.decode().decode_utf8_lossy().to_string();
+            let canonical_name = name.decode().decode_utf8()?.to_string();
             Ok((rem, canonical_name))
         }
     }
 
     pub fn parse_namespace<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {
         if !input.is_empty() {
-            let namespace = input
+            let mut namespace = String::with_capacity(input.len());
+            let mut components = input
                 .trim_matches('/')
                 .split('/')
-                .filter(|&c| !(c.is_empty() || c == "." || c == ".."))
-                .map(|c| c.decode().decode_utf8_lossy())
-                .join("/");
+                .filter(|&c| !(c.is_empty() || c == "." || c == ".."));
+            if let Some(c) = components.next() {
+                namespace.push_str(&c.decode().decode_utf8()?);
+            }
+            while let Some(c) = components.next() {
+                namespace.push('/');
+                namespace.push_str(&c.decode().decode_utf8()?);
+            }
             Ok(("", Some(namespace)))
         } else {
             Ok(("", None))
         }
     }
-
 }

@@ -213,17 +213,14 @@ fn fmt_delimited<T: fmt::Display>(
     delimiter: &str,
     formatter: &mut fmt::Formatter,
 ) -> fmt::Result {
-    let mut seen_first = false;
-    for value in values {
-        if seen_first {
-            write!(formatter, "{}", delimiter)?;
-        } else {
-            seen_first = true;
-        }
-
-        write!(formatter, "{}", value)?;
+    let mut iter = values.into_iter();
+    if let Some(val) = iter.next() {
+        val.fmt(formatter)?;
     }
-
+    while let Some(val) = iter.next() {
+        formatter.write_str(delimiter)?;
+        val.fmt(formatter)?;
+    }
     Ok(())
 }
 

@@ -1,10 +1,8 @@
 mod encodable;
 mod quickfind;
-mod joinable;
 
-pub use self::quickfind::QuickFind;
-pub use self::joinable::JoinableIterator;
 pub use self::encodable::PercentCodec;
+pub use self::quickfind::QuickFind;
 
 pub fn rcut(input: &str, sep: u8) -> (&str, &str) {
     if let Some(i) = input.quickrfind(sep) {
