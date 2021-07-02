@@ -1,6 +1,6 @@
-//! Error type and other helpers using the [`error-chain`] crate.
+//! Error and result type derived using the [`thiserror`] crate.
 //!
-//! [`error-chain`]: https://docs.rs/error-chain/
+//! [`thiserror`]: https://docs.rs/thiserror/
 
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum Error {
@@ -13,7 +13,7 @@ pub enum Error {
     #[error("missing type")]
     MissingType,
     #[error("utf-8 decoding failed")]
-    DecodingError(#[source] std::str::Utf8Error)
+    DecodingError(#[source] std::str::Utf8Error),
 }
 
 impl From<std::str::Utf8Error> for Error {

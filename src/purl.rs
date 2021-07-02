@@ -213,7 +213,6 @@ impl fmt::Display for PackageUrl<'_> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
 

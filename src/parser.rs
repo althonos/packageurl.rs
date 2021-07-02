@@ -27,7 +27,7 @@ pub mod owned {
 
     pub fn parse_subpath<'a>(input: &str) -> errors::Result<(&str, Option<String>)> {
         if let Some(i) = input.quickrfind(b'#') {
-            let mut subpath = String::with_capacity(i+1);
+            let mut subpath = String::with_capacity(i + 1);
             let mut components = input[i + 1..]
                 .trim_matches('/')
                 .split('/')

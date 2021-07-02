@@ -6,8 +6,8 @@ extern crate url;
 
 use std::str::FromStr;
 
-use test::Bencher;
 use packageurl::PackageUrl;
+use test::Bencher;
 
 #[bench]
 fn bench_from_str(b: &mut Bencher) {
