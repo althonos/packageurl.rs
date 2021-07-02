@@ -36,21 +36,33 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
 #[derive(Debug, Clone)]
 pub struct PackageUrl<'a> {
     /// The package URL type.
-    pub ty: Cow<'a, str>,
+    ty: Cow<'a, str>,
     /// The optional namespace
-    pub namespace: Option<Cow<'a, str>>,
+    namespace: Option<Cow<'a, str>>,
     /// The package name.
-    pub name: Cow<'a, str>,
+    name: Cow<'a, str>,
     /// The optional package version.
-    pub version: Option<Cow<'a, str>>,
+    version: Option<Cow<'a, str>>,
     /// The package qualifiers.
-    pub qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
     /// The package subpath.
-    pub subpath: Option<Cow<'a, str>>,
+    subpath: Option<Cow<'a, str>>,
 }
 
 impl<'a> PackageUrl<'a> {
     /// Create a new Package URL with the provided type and name.
+    ///
+    /// The Package URL type must be valid, otherwise an error will be returned.
+    /// The type can only be composed of ASCII letters and numbers, '.', '+'
+    /// and '-' (period, plus and dash). It cannot start with a number and
+    /// cannot contain spaces.
+    ///
+    /// # Example
+    /// ```rust
+    /// # extern crate packageurl;
+    /// assert!( packageurl::PackageUrl::new("cargo", "packageurl").is_ok() );
+    /// assert!( packageurl::PackageUrl::new("bad type", "packageurl").is_err() );
+    /// ```
     pub fn new<T, N>(ty: T, name: N) -> Result<Self>
     where
         T: Into<Cow<'a, str>>,
@@ -80,6 +92,36 @@ impl<'a> PackageUrl<'a> {
         }
     }
 
+    /// Get the Package URL type.
+    pub fn ty(&self) -> &str {
+        self.ty.as_ref()
+    }
+
+    /// Get the optional namespace.
+    pub fn namespace(&self) -> Option<&str> {
+        self.namespace.as_ref().map(Cow::as_ref)
+    }
+
+    /// Get the package name.
+    pub fn name(&self) -> &str {
+        self.name.as_ref()
+    }
+
+    /// Get the optional package version.
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_ref().map(Cow::as_ref)
+    }
+
+    /// Get the package qualifiers
+    pub fn qualifiers(&self) -> &HashMap<Cow<'a, str>, Cow<'a, str>> {
+        &self.qualifiers
+    }
+
+    /// Get the optional package subpath.
+    pub fn subpath(&self) -> Option<&str> {
+        self.subpath.as_ref().map(Cow::as_ref)
+    }
+
     /// Assign a namespace to the package.
     pub fn with_namespace<N>(&mut self, namespace: N) -> &mut Self
     where
@@ -99,22 +141,36 @@ impl<'a> PackageUrl<'a> {
     }
 
     /// Assign a subpath to the package.
-    pub fn with_subpath<S>(&mut self, subpath: S) -> &mut Self
+    ///
+    /// Subpaths must not contain empty, local ('.') or parent ('..') segments,
+    /// otherwise an error will be returned.
+    pub fn with_subpath<S>(&mut self, subpath: S) -> Result<&mut Self>
     where
         S: Into<Cow<'a, str>>,
     {
-        self.subpath = Some(subpath.into());
-        self
+        let s = subpath.into();
+        for component in s.split('/') {
+            if !validation::is_subpath_segment_valid(component) {
+                return Err(Error::InvalidSubpathSegment(component.into()));
+            }
+        }
+        self.subpath = Some(s);
+        Ok(self)
     }
 
     /// Add a qualifier to the package.
-    pub fn add_qualifier<K, V>(&mut self, key: K, value: V) -> &mut Self
+    pub fn add_qualifier<K, V>(&mut self, key: K, value: V) -> Result<&mut Self>
     where
         K: Into<Cow<'a, str>>,
         V: Into<Cow<'a, str>>,
     {
-        self.qualifiers.insert(key.into(), value.into());
-        self
+        let k = key.into();
+        if !validation::is_qualifier_key_valid(&k) {
+            Err(Error::InvalidKey(k.into()))
+        } else {
+            self.qualifiers.insert(k, value.into());
+            Ok(self)
+        }
     }
 }
 
@@ -174,7 +230,6 @@ impl fmt::Display for PackageUrl<'_> {
         if let Some(ref ns) = self.namespace {
             for component in ns
                 .split('/')
-                .filter(|s| !s.is_empty())
                 .map(|s| s.encode(ENCODE_SET))
             {
                 component.fmt(f).and(f.write_str("/"))?;
@@ -238,13 +293,13 @@ mod tests {
     fn test_from_str() {
         let raw_purl = "pkg:type/name/space/name@version?k1=v1&k2=v2#sub/path";
         let purl = PackageUrl::from_str(raw_purl).unwrap();
-        assert_eq!(purl.ty, "type");
-        assert_eq!(purl.namespace, Some(Cow::Borrowed("name/space")));
-        assert_eq!(purl.name, "name");
-        assert_eq!(purl.version, Some(Cow::Borrowed("version")));
-        assert_eq!(purl.qualifiers.get("k1"), Some(&Cow::Borrowed("v1")));
-        assert_eq!(purl.qualifiers.get("k2"), Some(&Cow::Borrowed("v2")));
-        assert_eq!(purl.subpath, Some(Cow::Borrowed("sub/path")));
+        assert_eq!(purl.ty(), "type");
+        assert_eq!(purl.namespace(), Some("name/space"));
+        assert_eq!(purl.name(), "name");
+        assert_eq!(purl.version(), Some("version"));
+        assert_eq!(purl.qualifiers().get("k1"), Some(&Cow::Borrowed("v1")));
+        assert_eq!(purl.qualifiers().get("k2"), Some(&Cow::Borrowed("v2")));
+        assert_eq!(purl.subpath(), Some("sub/path"));
     }
 
     #[test]
@@ -254,9 +309,9 @@ mod tests {
             .unwrap()
             .with_namespace("name/space")
             .with_version("version")
-            .with_subpath("sub/path")
-            .add_qualifier("k1", "v1")
-            .add_qualifier("k2", "v2")
+            .with_subpath("sub/path").unwrap()
+            .add_qualifier("k1", "v1").unwrap()
+            .add_qualifier("k2", "v2").unwrap()
             .to_string();
         assert_eq!(&purl_string, canonical);
     }

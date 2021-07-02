@@ -5,6 +5,7 @@ macro_rules! spec_tests {
             use super::testcase::SpecTestCase;
             use packageurl::PackageUrl;
             use std::str::FromStr;
+            use std::borrow::Cow;
 
             lazy_static! {
                 static ref TEST_CASE: SpecTestCase<'static> = SpecTestCase::new($desc);
@@ -14,15 +15,15 @@ macro_rules! spec_tests {
             fn purl_to_components() {
                 if let Ok(purl) = PackageUrl::from_str(&TEST_CASE.purl) {
                     assert!(!TEST_CASE.is_invalid);
-                    assert_eq!(TEST_CASE.ty.as_ref().unwrap(), &purl.ty);
-                    assert_eq!(TEST_CASE.name.as_ref().unwrap(), &purl.name);
-                    assert_eq!(TEST_CASE.namespace, purl.namespace);
-                    assert_eq!(TEST_CASE.version, purl.version);
-                    assert_eq!(TEST_CASE.subpath, purl.subpath);
+                    assert_eq!(TEST_CASE.ty.as_ref().unwrap().as_ref(), purl.ty());
+                    assert_eq!(TEST_CASE.name.as_ref().unwrap().as_ref(), purl.name());
+                    assert_eq!(TEST_CASE.namespace.as_ref().map(Cow::as_ref), purl.namespace());
+                    assert_eq!(TEST_CASE.version.as_ref().map(Cow::as_ref), purl.version());
+                    assert_eq!(TEST_CASE.subpath.as_ref().map(Cow::as_ref), purl.subpath());
                     if let Some(ref quals) = TEST_CASE.qualifiers {
-                        assert_eq!(quals, &purl.qualifiers);
+                        assert_eq!(quals, purl.qualifiers());
                     } else {
-                        assert!(purl.qualifiers.is_empty());
+                        assert!(purl.qualifiers().is_empty());
                     }
                 } else {
                     assert!(TEST_CASE.is_invalid);
@@ -47,12 +48,12 @@ macro_rules! spec_tests {
                 }
 
                 if let Some(ref sp) = TEST_CASE.subpath {
-                    purl.with_subpath(sp.as_ref());
+                    purl.with_subpath(sp.as_ref()).unwrap();
                 }
 
                 if let Some(ref quals) = TEST_CASE.qualifiers {
                     for (k, v) in quals.iter() {
-                        purl.add_qualifier(k.as_ref(), v.as_ref());
+                        purl.add_qualifier(k.as_ref(), v.as_ref()).unwrap();
                     }
                 }
 

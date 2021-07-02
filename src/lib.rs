@@ -13,8 +13,8 @@
 //! use packageurl::PackageUrl;
 //!
 //! let purl = PackageUrl::from_str("pkg:npm/%40angular/animation@12.3.1").unwrap();
-//! assert_eq!(purl.name, "animation");
-//! assert_eq!(purl.namespace, Some(Cow::from("@angular")));
+//! assert_eq!(purl.name(), "animation");
+//! assert_eq!(purl.namespace(), Some("@angular"));
 //! ```
 //!
 //! Parsing a purl may fail, in which case an error kind from the [`errors`] module
