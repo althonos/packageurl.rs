@@ -16,7 +16,7 @@ jobs:
         feature:
           - default
           - memchr
-          # - serde
+          - serde
     steps:
     - name: Checkout code
       uses: actions/checkout@v1
