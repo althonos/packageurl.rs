@@ -57,10 +57,16 @@ pub struct PackageUrl<'a> {
 impl<'a> PackageUrl<'a> {
     /// Create a new Package URL with the provided type and name.
     ///
+    /// # Type
     /// The Package URL type must be valid, otherwise an error will be returned.
     /// The type can only be composed of ASCII letters and numbers, '.', '+'
     /// and '-' (period, plus and dash). It cannot start with a number and
     /// cannot contain spaces.
+    ///
+    /// # Name
+    /// The package name will be canonicalize depending on the type: for instance,
+    /// 'bitbucket' packages have a case-insensitive name, so the name will be
+    /// lowercased if needed.
     ///
     /// # Example
     /// ```rust
@@ -73,9 +79,32 @@ impl<'a> PackageUrl<'a> {
         T: Into<Cow<'a, str>>,
         N: Into<Cow<'a, str>>,
     {
-        let t = ty.into();
+        let mut t = ty.into();
+        let mut n = name.into();
         if validation::is_type_valid(&t) {
-            Ok(Self::new_unchecked(t, name))
+            // lowercase type if needed
+            if !t.chars().all(|c| c.is_lowercase()) {
+                t = Cow::Owned(t.to_lowercase());
+            }
+            // lowercase name if required by type and needed
+            match t.as_ref() {
+                "bitbucket" | "deb" | "github" | "hex" | "npm" => {
+                    if !n.chars().all(|c| c.is_uppercase()) {
+                        n = Cow::Owned(n.to_lowercase());
+                    }
+                }
+                "pypi" => {
+                    if !n.chars().all(|c| c.is_uppercase()) {
+                        n = Cow::Owned(n.to_lowercase());
+                    }
+                    if n.chars().any(|c| c == '_') {
+                        n = Cow::Owned(n.replace("_", "-"));
+                    }
+                }
+                _ => {}
+            }
+
+            Ok(Self::new_unchecked(t, n))
         } else {
             Err(Error::InvalidType(t.to_string()))
         }
@@ -132,7 +161,17 @@ impl<'a> PackageUrl<'a> {
     where
         N: Into<Cow<'a, str>>,
     {
-        self.namespace = Some(namespace.into());
+
+        let mut n = namespace.into();
+        match &self.ty {
+            "bitbucket" | "deb" | "github" | "golang" | "hex" | "rpm" => {
+                if n.chars().any(|c| c.is_uppercase()) {
+                    n = Cow::Owned(n.to_lowercase());
+                }
+            }
+        }
+
+        self.namespace = Some(n);
         self
     }
 
@@ -204,7 +243,7 @@ impl FromStr for PackageUrl<'static> {
             _ => {}
         };
 
-        let mut purl = Self::new_unchecked(ty, name);
+        let mut purl = Self::new(ty, name)?;
         if let Some(ns) = namespace {
             purl.namespace = Some(ns.into());
         }
