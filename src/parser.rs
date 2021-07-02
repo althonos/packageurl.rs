@@ -1,9 +1,9 @@
-use super::errors::Result;
 use super::errors::Error;
-use super::validation;
+use super::errors::Result;
 use super::utils;
 use super::utils::PercentCodec;
 use super::utils::QuickFind;
+use super::validation;
 
 pub fn parse_scheme<'a>(input: &str) -> Result<(&str, String)> {
     if let Some(i) = input.quickfind(b':') {
@@ -62,7 +62,10 @@ pub fn parse_qualifiers<'a>(input: &str) -> Result<(&str, Vec<(String, String)>)
             .filter(|ref pair| !pair.1.is_empty());
         for (key, value) in pairs {
             if validation::is_qualifier_key_valid(key) {
-                qualifiers.push((key.to_lowercase(), value.decode().decode_utf8()?.to_string()))
+                qualifiers.push((
+                    key.to_lowercase(),
+                    value.decode().decode_utf8()?.to_string(),
+                ))
             } else {
                 return Err(Error::InvalidKey(key.to_string()));
             }
@@ -75,7 +78,10 @@ pub fn parse_qualifiers<'a>(input: &str) -> Result<(&str, Vec<(String, String)>)
 
 pub fn parse_version<'a>(input: &str) -> Result<(&str, Option<String>)> {
     if let Some(i) = input.quickrfind(b'@') {
-        Ok((&input[..i], Some(input[i + 1..].decode().decode_utf8()?.into())))
+        Ok((
+            &input[..i],
+            Some(input[i + 1..].decode().decode_utf8()?.into()),
+        ))
     } else {
         Ok((input, None))
     }
@@ -86,12 +92,8 @@ pub fn parse_type<'a>(input: &str) -> Result<(&str, String)> {
         Some(i) if validation::is_type_valid(&input[..i]) => {
             Ok((&input[i + 1..], input[..i].to_lowercase().into()))
         }
-        Some(i) => {
-            Err(Error::InvalidType(input[..i].to_string()))
-        }
-        None => {
-            Err(Error::MissingType)
-        }
+        Some(i) => Err(Error::InvalidType(input[..i].to_string())),
+        None => Err(Error::MissingType),
     }
 }
 

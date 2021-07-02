@@ -1,19 +1,19 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Display;
-use std::fmt::Result as FmtResult;
 use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
 use std::str::FromStr;
 
+use percent_encoding::AsciiSet;
 #[cfg(feature = "serde")]
 use serde::Serialize;
-use percent_encoding::AsciiSet;
 
 use super::errors::Error;
 use super::errors::Result;
 use super::parser;
-use super::validation;
 use super::utils::PercentCodec;
+use super::validation;
 
 const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     .add(b' ')
@@ -161,7 +161,6 @@ impl<'a> PackageUrl<'a> {
     where
         N: Into<Cow<'a, str>>,
     {
-
         let mut n = namespace.into();
         match self.ty.as_ref() {
             "bitbucket" | "deb" | "github" | "golang" | "hex" | "rpm" => {
@@ -276,10 +275,7 @@ impl Display for PackageUrl<'_> {
 
         // Namespace: percent-encode each component
         if let Some(ref ns) = self.namespace {
-            for component in ns
-                .split('/')
-                .map(|s| s.encode(ENCODE_SET))
-            {
+            for component in ns.split('/').map(|s| s.encode(ENCODE_SET)) {
                 component.fmt(f).and(f.write_str("/"))?;
             }
         }
@@ -332,7 +328,6 @@ impl Display for PackageUrl<'_> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
 
@@ -358,9 +353,12 @@ mod tests {
             .unwrap()
             .with_namespace("name/space")
             .with_version("version")
-            .with_subpath("sub/path").unwrap()
-            .add_qualifier("k1", "v1").unwrap()
-            .add_qualifier("k2", "v2").unwrap()
+            .with_subpath("sub/path")
+            .unwrap()
+            .add_qualifier("k1", "v1")
+            .unwrap()
+            .add_qualifier("k2", "v2")
+            .unwrap()
             .to_string();
         assert_eq!(&purl_string, canonical);
     }
@@ -371,14 +369,16 @@ mod tests {
         let mut purl = PackageUrl::new("type", "name").unwrap();
         purl.with_namespace("name/space")
             .with_version("version")
-            .with_subpath("sub/path").unwrap()
-            .add_qualifier("k1", "v1").unwrap()
-            .add_qualifier("k2", "v2").unwrap();
+            .with_subpath("sub/path")
+            .unwrap()
+            .add_qualifier("k1", "v1")
+            .unwrap()
+            .add_qualifier("k2", "v2")
+            .unwrap();
 
         let j = serde_json::to_string(&purl).unwrap();
         let purl2: PackageUrl = serde_json::from_str(&j).unwrap();
 
         assert_eq!(purl, purl2);
-
     }
 }

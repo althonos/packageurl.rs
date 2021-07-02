@@ -9,7 +9,7 @@ pub fn is_type_valid(ty: &str) -> bool {
     }
 
     ty.chars().all(|c| match c {
-        '.' | '-' | '+' | 'a' ..= 'z' | 'A' ..= 'Z' | '0' ..= '9' => true,
+        '.' | '-' | '+' | 'a'..='z' | 'A'..='Z' | '0'..='9' => true,
         _ => false,
     })
 }
@@ -28,7 +28,7 @@ pub fn is_qualifier_key_valid(key: &str) -> bool {
     // check the key contains only valid characters
     // The key must be composed only of ASCII letters and numbers, '.', '-' and '_' (period, dash and underscore)
     key.chars().all(|c| match c {
-        '.' | '-' | '_' | 'a' ..= 'z' | 'A' ..= 'Z' | '0' ..= '9' => true,
+        '.' | '-' | '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' => true,
         _ => false,
     })
 }
