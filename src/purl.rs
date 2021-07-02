@@ -149,10 +149,10 @@ impl FromStr for PackageUrl<'static> {
 impl fmt::Display for PackageUrl<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Scheme: constant
-        write!(f, "pkg:")?;
+        f.write_str("pkg:")?;
 
         // Type: no encoding needed
-        write!(f, "{}/", self.ty)?;
+        self.ty.fmt(f).and(f.write_str("/"))?;
 
         // Namespace: percent-encode each component
         if let Some(ref ns) = self.namespace {
@@ -161,68 +161,58 @@ impl fmt::Display for PackageUrl<'_> {
                 .filter(|s| !s.is_empty())
                 .map(|s| s.encode(ENCODE_SET))
             {
-                write!(f, "{}/", component)?;
+                component.fmt(f).and(f.write_str("/"))?;
             }
         }
 
         // Name: percent-encode the name
-        write!(f, "{}", self.name.encode(ENCODE_SET))?;
+        self.name.encode(ENCODE_SET).fmt(f)?;
 
         // Version: percent-encode the version
         if let Some(ref v) = self.version {
-            write!(f, "@{}", v.encode(ENCODE_SET))?;
+            f.write_str("@").and(v.encode(ENCODE_SET).fmt(f))?;
         }
 
         // Qualifiers: percent-encode the values
         if !self.qualifiers.is_empty() {
-            write!(f, "?")?;
+            f.write_str("?")?;
 
             let mut items = self.qualifiers.iter().collect::<Vec<_>>();
             items.sort();
 
-            fmt_delimited(
-                items
-                    .into_iter()
-                    .map(|(k, v)| format!("{}={}", k, v.encode(ENCODE_SET))),
-                "&",
-                f,
-            )?;
+            let mut iter = items.into_iter();
+            if let Some((k, v)) = iter.next() {
+                k.fmt(f)
+                    .and(f.write_str("="))
+                    .and(v.encode(ENCODE_SET).fmt(f))?;
+            }
+            while let Some((k, v)) = iter.next() {
+                f.write_str("&")
+                    .and(k.fmt(f))
+                    .and(f.write_str("="))
+                    .and(v.encode(ENCODE_SET).fmt(f))?;
+            }
         }
 
         // Subpath: percent-encode the components
         if let Some(ref sp) = self.subpath {
-            write!(f, "#")?;
-            fmt_delimited(
-                sp.split('/')
-                    .filter(|&s| match s {
-                        "" | "." | ".." => false,
-                        _ => true,
-                    })
-                    .map(|s| s.encode(ENCODE_SET)),
-                "/",
-                f,
-            )?;
+            f.write_str("#")?;
+            let mut components = sp
+                .split('/')
+                .filter(|&s| !(s == "" || s == "." || s == ".."));
+            if let Some(component) = components.next() {
+                component.encode(ENCODE_SET).fmt(f)?;
+            }
+            while let Some(component) = components.next() {
+                f.write_str("/")?;
+                component.encode(ENCODE_SET).fmt(f)?;
+            }
         }
 
         Ok(())
     }
 }
 
-fn fmt_delimited<T: fmt::Display>(
-    values: impl IntoIterator<Item = T>,
-    delimiter: &str,
-    formatter: &mut fmt::Formatter,
-) -> fmt::Result {
-    let mut iter = values.into_iter();
-    if let Some(val) = iter.next() {
-        val.fmt(formatter)?;
-    }
-    while let Some(val) = iter.next() {
-        formatter.write_str(delimiter)?;
-        val.fmt(formatter)?;
-    }
-    Ok(())
-}
 
 #[cfg(test)]
 mod tests {
