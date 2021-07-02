@@ -65,7 +65,7 @@ pub fn parse_qualifiers<'a>(input: &str) -> Result<(&str, Vec<(String, String)>)
 
 pub fn parse_version<'a>(input: &str) -> Result<(&str, Option<String>)> {
     if let Some(i) = input.quickrfind(b'@') {
-        Ok((&input[..i], Some(input[i + 1..].to_string().into())))
+        Ok((&input[..i], Some(input[i + 1..].decode().decode_utf8()?.into())))
     } else {
         Ok((input, None))
     }
