@@ -83,7 +83,7 @@ impl<'a> PackageUrl<'a> {
         let mut n = name.into();
         if validation::is_type_valid(&t) {
             // lowercase type if needed
-            if !t.chars().all(|c| c.is_lowercase()) {
+            if !t.chars().all(|c| c.is_uppercase()) {
                 t = Cow::Owned(t.to_lowercase());
             }
             // lowercase name if required by type and needed
@@ -163,12 +163,13 @@ impl<'a> PackageUrl<'a> {
     {
 
         let mut n = namespace.into();
-        match &self.ty {
+        match self.ty.as_ref() {
             "bitbucket" | "deb" | "github" | "golang" | "hex" | "rpm" => {
                 if n.chars().any(|c| c.is_uppercase()) {
                     n = Cow::Owned(n.to_lowercase());
                 }
             }
+            _ => {}
         }
 
         self.namespace = Some(n);
@@ -208,10 +209,13 @@ impl<'a> PackageUrl<'a> {
         K: Into<Cow<'a, str>>,
         V: Into<Cow<'a, str>>,
     {
-        let k = key.into();
+        let mut k = key.into();
         if !validation::is_qualifier_key_valid(&k) {
             Err(Error::InvalidKey(k.into()))
         } else {
+            if k.chars().any(|c| c.is_uppercase()) {
+                k = Cow::Owned(k.to_lowercase());
+            }
             self.qualifiers.insert(k, value.into());
             Ok(self)
         }
@@ -245,16 +249,16 @@ impl FromStr for PackageUrl<'static> {
 
         let mut purl = Self::new(ty, name)?;
         if let Some(ns) = namespace {
-            purl.namespace = Some(ns.into());
+            purl.with_namespace(ns);
         }
         if let Some(v) = version {
-            purl.version = Some(v.into());
+            purl.with_version(v);
         }
         if let Some(sp) = subpath {
-            purl.subpath = Some(sp.into());
+            purl.with_subpath(sp)?;
         }
         for (k, v) in ql.into_iter() {
-            purl.qualifiers.insert(k.into(), v.into());
+            purl.add_qualifier(k, v)?;
         }
 
         // The obtained package url
