@@ -3,11 +3,10 @@ name: Publish to Crates.io
 on:
   push:
     tags:
-      - v*.*.*
+      - "*.*.*"
 
 jobs:
   publish:
-    needs: publish-derive
     runs-on: ubuntu-latest
     environment: Crates.io
     name: Publish Rust crate
