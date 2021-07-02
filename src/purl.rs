@@ -1,8 +1,12 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::fmt;
+use std::fmt::Display;
+use std::fmt::Result as FmtResult;
+use std::fmt::Formatter;
 use std::str::FromStr;
 
+#[cfg(feature = "serde")]
+use serde::Serialize;
 use percent_encoding::AsciiSet;
 
 use super::errors::Error;
@@ -34,6 +38,7 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
 
 /// A Package URL.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PackageUrl<'a> {
     /// The package URL type.
     ty: Cow<'a, str>,
@@ -218,8 +223,8 @@ impl FromStr for PackageUrl<'static> {
     }
 }
 
-impl fmt::Display for PackageUrl<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl Display for PackageUrl<'_> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
         // Scheme: constant
         f.write_str("pkg:")?;
 
@@ -284,6 +289,9 @@ impl fmt::Display for PackageUrl<'_> {
     }
 }
 
+
+
+
 #[cfg(test)]
 mod tests {
 
@@ -314,5 +322,22 @@ mod tests {
             .add_qualifier("k2", "v2").unwrap()
             .to_string();
         assert_eq!(&purl_string, canonical);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serde() {
+        let mut purl = PackageUrl::new("type", "name").unwrap();
+        purl.with_namespace("name/space")
+            .with_version("version")
+            .with_subpath("sub/path").unwrap()
+            .add_qualifier("k1", "v1").unwrap()
+            .add_qualifier("k2", "v2").unwrap();
+
+        let j = serde_json::to_string(&purl).unwrap();
+        let purl2: PackageUrl = serde_json::from_str(&j).unwrap();
+
+        // assert_eq!(purl, purl2);
+
     }
 }

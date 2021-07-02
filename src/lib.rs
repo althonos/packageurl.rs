@@ -37,6 +37,9 @@
 
 #[cfg(feature = "memchr")]
 extern crate memchr;
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
 #[macro_use]
 extern crate thiserror;
 extern crate percent_encoding;
