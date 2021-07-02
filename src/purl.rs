@@ -5,8 +5,10 @@ use std::str::FromStr;
 
 use percent_encoding::AsciiSet;
 
-use super::errors;
+use super::errors::Error;
+use super::errors::Result;
 use super::parser;
+use super::validation;
 use super::utils::PercentCodec;
 
 const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
@@ -49,7 +51,21 @@ pub struct PackageUrl<'a> {
 
 impl<'a> PackageUrl<'a> {
     /// Create a new Package URL with the provided type and name.
-    pub fn new<T, N>(ty: T, name: N) -> Self
+    pub fn new<T, N>(ty: T, name: N) -> Result<Self>
+    where
+        T: Into<Cow<'a, str>>,
+        N: Into<Cow<'a, str>>,
+    {
+        let t = ty.into();
+        if validation::is_type_valid(&t) {
+            Ok(Self::new_unchecked(t, name))
+        } else {
+            Err(Error::InvalidType(t.to_string()))
+        }
+    }
+
+    /// Create a new Package URL without checking the type.
+    fn new_unchecked<T, N>(ty: T, name: N) -> Self
     where
         T: Into<Cow<'a, str>>,
         N: Into<Cow<'a, str>>,
@@ -103,9 +119,9 @@ impl<'a> PackageUrl<'a> {
 }
 
 impl FromStr for PackageUrl<'static> {
-    type Err = errors::Error;
+    type Err = Error;
 
-    fn from_str(s: &str) -> errors::Result<Self> {
+    fn from_str(s: &str) -> Result<Self> {
         // Parse all components into strings (since we don't know infer from `s` lifetime)
         let (s, _) = parser::parse_scheme(s)?;
         let (s, subpath) = parser::parse_subpath(s)?;
@@ -127,18 +143,18 @@ impl FromStr for PackageUrl<'static> {
             _ => {}
         };
 
-        let mut purl = Self::new(ty, name);
+        let mut purl = Self::new_unchecked(ty, name);
         if let Some(ns) = namespace {
-            purl.with_namespace(ns);
+            purl.namespace = Some(ns.into());
         }
         if let Some(v) = version {
-            purl.with_version(v);
+            purl.version = Some(v.into());
         }
         if let Some(sp) = subpath {
-            purl.with_subpath(sp);
+            purl.subpath = Some(sp.into());
         }
         for (k, v) in ql.into_iter() {
-            purl.add_qualifier(k, v);
+            purl.qualifiers.insert(k.into(), v.into());
         }
 
         // The obtained package url
@@ -235,6 +251,7 @@ mod tests {
     fn test_to_str() {
         let canonical = "pkg:type/name/space/name@version?k1=v1&k2=v2#sub/path";
         let purl_string = PackageUrl::new("type", "name")
+            .unwrap()
             .with_namespace("name/space")
             .with_version("version")
             .with_subpath("sub/path")

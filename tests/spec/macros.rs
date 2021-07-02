@@ -35,7 +35,8 @@ macro_rules! spec_tests {
                     return;
                 }
 
-                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref().unwrap().clone(), TEST_CASE.name.as_ref().unwrap().clone());
+                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref().unwrap().clone(), TEST_CASE.name.as_ref().unwrap().clone())
+                    .unwrap();
 
                 if let Some(ref ns) = TEST_CASE.namespace {
                     purl.with_namespace(ns.as_ref());
