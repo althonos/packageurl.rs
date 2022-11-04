@@ -228,7 +228,7 @@
     "is_invalid": true
   },
   {
-    "description": "a namespace is required",
+    "description": "maven requires a namespace",
     "purl": "pkg:maven/io@1.3.4",
     "canonical_purl": "pkg:maven/io@1.3.4",
     "type": "maven",
@@ -240,7 +240,7 @@
     "is_invalid": true
   },
   {
-    "description": "a namespace is required",
+    "description": "maven requires a non-empty namespace",
     "purl": "pkg:maven//io@1.3.4",
     "canonical_purl": "pkg:maven//io@1.3.4",
     "type": "maven",

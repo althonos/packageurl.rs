@@ -19,6 +19,8 @@ spec_tests!(github, "github namespace and name should be lowercased");
 spec_tests!(docker, "docker uses qualifiers and hash image id as versions");
 spec_tests!(maven, "valid maven purl");
 spec_tests!(maven_basic, "basic valid maven purl without version");
+spec_tests!(maven_requires_namespace, "maven requires a namespace");
+spec_tests!(maven_requires_nonempty_namespace, "maven requires a non-empty namespace");
 spec_tests!(maven_case_sensitive, "valid maven purl with case sensitive namespace and name");
 spec_tests!(maven_space, "valid maven purl containing a space in the version and qualifier");
 spec_tests!(go_subpath, "valid go purl without version and with subpath");

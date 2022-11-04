@@ -232,7 +232,7 @@ impl FromStr for PackageUrl<'static> {
         let (s, version) = parser::parse_version(s)?;
         let (s, ty) = parser::parse_type(s)?;
         let (s, mut name) = parser::parse_name(s)?;
-        let (_, mut namespace) = parser::parse_namespace(s)?;
+        let (_, mut namespace) = parser::parse_namespace(s, &ty)?;
 
         // Special rules for some types
         match ty.as_ref() {

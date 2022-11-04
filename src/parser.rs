@@ -107,7 +107,7 @@ pub fn parse_name<'a>(input: &str) -> Result<(&str, String)> {
     }
 }
 
-pub fn parse_namespace<'a>(input: &str) -> Result<(&str, Option<String>)> {
+pub fn parse_namespace<'a>(input: &'a str, pkg_type: &str) -> Result<(&'a str, Option<String>)> {
     if !input.is_empty() {
         let mut namespace = String::with_capacity(input.len());
         let mut components = input
@@ -133,6 +133,10 @@ pub fn parse_namespace<'a>(input: &str) -> Result<(&str, Option<String>)> {
         }
         Ok(("", Some(namespace)))
     } else {
-        Ok(("", None))
+        //Some ecosystems require non-empty namespaces
+        match pkg_type {
+            "maven" => Err(Error::InvalidNamespaceComponent(input.to_string())),
+            _ => Ok(("", None))
+        }
     }
 }
