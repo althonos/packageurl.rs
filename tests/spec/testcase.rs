@@ -25,7 +25,7 @@ impl<'a> SpecTestCase<'a> {
             let json = v
                 .into_iter()
                 .find(|x| x["description"].as_str().unwrap().eq(desc))
-                .unwrap();
+                .expect(&format!("Failed to find test with expected description of {desc}"));
             ::serde_json::from_value(json).unwrap()
         } else {
             unreachable!("invalid json file")

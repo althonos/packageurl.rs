@@ -29,3 +29,5 @@ spec_tests!(maven_type, "maven can come with a type qualifier");
 spec_tests!(simple_slash, "slash / after scheme is not significant");
 spec_tests!(double_slash, "double slash // after scheme is not significant");
 spec_tests!(triple_slash, "slash /// after type  is not significant");
+spec_tests!(hackage, "valid hackage purl");
+spec_tests!(hackage_name_and_version_required, "hackage purl requires name and version");

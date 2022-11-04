@@ -86,7 +86,7 @@
   {
     "description": "docker uses qualifiers and hash image id as versions",
     "purl": "pkg:docker/customer/dockerimage@sha256:244fd47e07d1004f0aed9c?repository_url=gcr.io",
-    "canonical_purl": "pkg:docker/customer/dockerimage@sha256:244fd47e07d1004f0aed9c?repository_url=gcr.io",
+    "canonical_purl": "pkg:docker/customer/dockerimage@sha256%3A244fd47e07d1004f0aed9c?repository_url=gcr.io",
     "type": "docker",
     "namespace": "customer",
     "name": "dockerimage",
@@ -109,8 +109,8 @@
   },
   {
     "description": "maven often uses qualifiers",
-    "purl": "pkg:Maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=sources&repositorY_url=repo.spring.io/release",
-    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=sources&repository_url=repo.spring.io/release",
+    "purl": "pkg:Maven/org.apache.xmlgraphics/batik-anim@1.9.1?repositorY_url=repo.spring.io/release&classifier=sources",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=sources&repository_url=repo.spring.io%2Frelease",
     "type": "maven",
     "namespace": "org.apache.xmlgraphics",
     "name": "batik-anim",
@@ -121,8 +121,8 @@
   },
   {
     "description": "maven pom reference",
-    "purl": "pkg:Maven/org.apache.xmlgraphics/batik-anim@1.9.1?extension=pom&repositorY_url=repo.spring.io/release",
-    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?extension=pom&repository_url=repo.spring.io/release",
+    "purl": "pkg:Maven/org.apache.xmlgraphics/batik-anim@1.9.1?repositorY_url=repo.spring.io/release&extension=pom",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?extension=pom&repository_url=repo.spring.io%2Frelease",
     "type": "maven",
     "namespace": "org.apache.xmlgraphics",
     "name": "batik-anim",
@@ -133,7 +133,7 @@
   },
   {
     "description": "maven can come with a type qualifier",
-    "purl": "pkg:Maven/net.sf.jacob-project/jacob@1.14.3?classifier=x86&type=dll",
+    "purl": "pkg:Maven/net.sf.jacob-project/jacob@1.14.3?type=dll&classifier=x86",
     "canonical_purl": "pkg:maven/net.sf.jacob-project/jacob@1.14.3?classifier=x86&type=dll",
     "type": "maven",
     "namespace": "net.sf.jacob-project",
@@ -228,6 +228,30 @@
     "is_invalid": true
   },
   {
+    "description": "a namespace is required",
+    "purl": "pkg:maven/io@1.3.4",
+    "canonical_purl": "pkg:maven/io@1.3.4",
+    "type": "maven",
+    "namespace": null,
+    "name": null,
+    "version": null,
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": true
+  },
+  {
+    "description": "a namespace is required",
+    "purl": "pkg:maven//io@1.3.4",
+    "canonical_purl": "pkg:maven//io@1.3.4",
+    "type": "maven",
+    "namespace": null,
+    "name": null,
+    "version": null,
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": true
+  },
+  {
     "description": "slash / after scheme is not significant",
     "purl": "pkg:/maven/org.apache.commons/io",
     "canonical_purl": "pkg:maven/org.apache.commons/io",
@@ -296,6 +320,30 @@
     "name": "myartifact",
     "version": "1.0.0",
     "qualifiers": {"in production": "true"},
+    "subpath": null,
+    "is_invalid": true
+  },
+  {
+    "description": "valid hackage purl",
+    "purl": "pkg:hackage/AC-HalfInteger@1.2.1",
+    "canonical_purl": "pkg:hackage/AC-HalfInteger@1.2.1",
+    "type": "hackage",
+    "namespace": null,
+    "name": "AC-HalfInteger",
+    "version": "1.2.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "hackage purl requires name and version",
+    "purl": "pkg:hackage",
+    "canonical_purl": "pkg:hackage",
+    "type": "hackage",
+    "namespace": null,
+    "name": null,
+    "version": null,
+    "qualifiers": null,
     "subpath": null,
     "is_invalid": true
   }
