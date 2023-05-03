@@ -175,12 +175,24 @@ impl<'a> PackageUrl<'a> {
         self
     }
 
+    /// Clear the namespace
+    pub fn without_namespace(&mut self) -> &mut Self {
+        self.namespace = None;
+        self
+    }
+
     /// Assign a version to the package.
     pub fn with_version<V>(&mut self, version: V) -> &mut Self
     where
         V: Into<Cow<'a, str>>,
     {
         self.version = Some(version.into());
+        self
+    }
+
+    /// Clear the version
+    pub fn without_version(&mut self) -> &mut Self {
+        self.version = None;
         self
     }
 
@@ -200,6 +212,18 @@ impl<'a> PackageUrl<'a> {
         }
         self.subpath = Some(s);
         Ok(self)
+    }
+
+    /// Clear the subpath
+    pub fn without_subpath(&mut self) -> &mut Self {
+        self.subpath = None;
+        self
+    }
+
+    /// Clear qualifiers
+    pub fn clear_qualifiers(&mut self) -> &mut Self {
+        self.qualifiers.clear();
+        self
     }
 
     /// Add a qualifier to the package.
