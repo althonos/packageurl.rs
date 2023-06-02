@@ -37,7 +37,7 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     .add(b'|');
 
 /// A Package URL.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PackageUrl<'a> {
     /// The package URL type.
