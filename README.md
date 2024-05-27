@@ -72,9 +72,9 @@ See more in the [online documentation](https://docs.rs/packageurl/).
 
 ## 📋 Changelog
 
-This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
-and provides a [changelog](https://github.com/althonos/packageurl-rs/blob/master/CHANGELOG.md)
-in the [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) format.
+This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) and provides
+a [changelog](https://github.com/althonos/packageurl-rs/blob/master/CHANGELOG.md) as part of
+the [GitHub releases](https://github.com/althonos/packageurl.rs/releases).
 
 ## 💭 Feedback
 
