@@ -11,16 +11,14 @@ jobs:
     environment: Crates.io
     name: Publish Rust crate
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v1
-    - name: Setup Rust ${{ matrix.rust-toolchain }}
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: Package and publish crate
-      uses: actions-rs/cargo@v1
-      with:
-        command: publish
-        args: '--token ${{ secrets.CRATES_IO_TOKEN }}'
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup | Rust
+        run: |
+          rustup toolchain install ${{ matrix.rust-toolchain }} --profile minimal
+          rustup default ${{ matrix.rust-toolchain }}
+      - name: Package and publish crate
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          cargo publish
