@@ -20,19 +20,21 @@ Add this crate to the `Cargo.toml`:
 
 ```toml
 [dependencies]
-packageurl = "0.3.0"
+packageurl = "0.4.0"
 ```
 
 Parse a string containing a raw PURL using the
 [`FromStr`](https://doc.rust-lang.org/std/str/trait.FromStr.html) trait:
 
 ```rust
-extern crate packageurl
+extern crate packageurl;
 
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
-let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.3.0");
+fn example() {
+    let purl = PackageUrl::from_str("pkg:cargo/packageurl@0.3.0");
+}
 ```
 
 Creating a PURL from Rust and then generating a string representation using:
@@ -43,10 +45,12 @@ extern crate packageurl;
 
 use std::string::ToString;
 
-let canonical = package::PackageUrl::new("cargo", "packageurl")
-.expect("only fails if type is invalid")
-.with_version("0.3.0")
-.to_string();
+fn example() {
+    let canonical = package::PackageUrl::new("cargo", "packageurl")
+        .expect("only fails if type is invalid")
+        .with_version("0.3.0")
+        .to_string();
+}
 ```
 
 `serde` serialization and deserialization is also supported, provided the
@@ -54,7 +58,7 @@ let canonical = package::PackageUrl::new("cargo", "packageurl")
 
 ```toml
 [dependencies]
-packageurl = { version = "0.3.0", features = ["serde"] }
+packageurl = { version = "0.4.0", features = ["serde"] }
 ```
 
 See more in the [online documentation](https://docs.rs/packageurl/).
@@ -74,7 +78,7 @@ in the [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) format.
 
 ## 💭 Feedback
 
-Found a bug ? Have an enhancement request ? Head over to the
+Found a bug? Have an enhancement request? Head over to the
 [GitHub issue tracker](https://github.com/althonos/packageurl-rs/issues) of the project if
 you need to report or ask something. If you are filling in on a bug, please include as much
 information as you can about the issue, and try to recreate the same bug in a simple, easily
@@ -82,5 +86,4 @@ reproducible situation.
 
 ## ⚖️ License
 
-This library is provided under the open-source
-[MIT license](https://choosealicense.com/licenses/mit/).
+This library is provided under the open-source [MIT license](https://choosealicense.com/licenses/mit/).
