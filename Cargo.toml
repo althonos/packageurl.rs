@@ -13,8 +13,12 @@ categories = ["parser-implementations", "encoding", "development-tools"]
 [dependencies]
 percent-encoding = "2.1.0"
 thiserror = "1.0.0"
+
 memchr = { version = "2.4.0", optional = true }
-serde = { version = "1.0.0", optional = true , features = ["derive"] }
+serde = { version = "1.0.0", optional = true, features = ["derive"] }
+
+[features]
+default = []
 
 [dev-dependencies]
 serde = { version = "1.0.0", features = ["derive"] }
