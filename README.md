@@ -7,8 +7,6 @@
 [![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square)](https://github.com/althonos/packageurl.rs)
 [![Crate](https://img.shields.io/crates/v/packageurl.svg?maxAge=86400&style=flat-square)](https://crates.io/crates/packageurl)
 [![Documentation](https://img.shields.io/badge/docs-latest-4d76ae.svg?maxAge=86400&style=flat-square)](https://docs.rs/packageurl)
-[![CargoMake](https://img.shields.io/badge/built%20with-cargo--make-yellow.svg?maxAge=86400&style=flat-square)](https://sagiegurari.github.io/cargo-make)
-[![Changelog](https://img.shields.io/badge/keep%20a-changelog-8A0707.svg?maxAge=86400&style=flat-square)](http://keepachangelog.com/)
 [![GitHub issues](https://img.shields.io/github/issues/althonos/packageurl-rs.svg?style=flat-square&maxAge=600)](https://github.com/althonos/packageurl-rs/issues)
 
 ## About
@@ -30,6 +28,7 @@ Parse a string containing a raw PURL using the
 
 ```rust
 extern crate packageurl
+
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
@@ -41,16 +40,18 @@ the [`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html) trait
 
 ```rust
 extern crate packageurl;
+
 use std::string::ToString;
 
 let canonical = package::PackageUrl::new("cargo", "packageurl")
-    .expect("only fails if type is invalid")
-    .with_version("0.3.0")
-    .to_string();
+.expect("only fails if type is invalid")
+.with_version("0.3.0")
+.to_string();
 ```
 
 `serde` serialization and deserialization is also supported, provided the
 `serde` feature is enabled:
+
 ```toml
 [dependencies]
 packageurl = { version = "0.3.0", features = ["serde"] }
