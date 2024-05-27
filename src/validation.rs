@@ -4,10 +4,11 @@ pub fn is_type_valid(ty: &str) -> bool {
         Some(c) => c,
         None => return false,
     };
-    if first.is_digit(10) {
+    if first.is_ascii_digit() {
         return false;
     }
 
+    #[allow(clippy::match_like_matches_macro)]
     ty.chars().all(|c| match c {
         '.' | '-' | '+' | 'a'..='z' | 'A'..='Z' | '0'..='9' => true,
         _ => false,
@@ -21,12 +22,13 @@ pub fn is_qualifier_key_valid(key: &str) -> bool {
         Some(c) => c,
         None => return false,
     };
-    if first.is_digit(10) {
+    if first.is_ascii_digit() {
         return false;
     }
 
     // check the key contains only valid characters
     // The key must be composed only of ASCII letters and numbers, '.', '-' and '_' (period, dash and underscore)
+    #[allow(clippy::match_like_matches_macro)]
     key.chars().all(|c| match c {
         '.' | '-' | '_' | 'a'..='z' | 'A'..='Z' | '0'..='9' => true,
         _ => false,

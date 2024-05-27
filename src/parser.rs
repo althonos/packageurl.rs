@@ -5,7 +5,7 @@ use super::utils::PercentCodec;
 use super::utils::QuickFind;
 use super::validation;
 
-pub fn parse_scheme<'a>(input: &str) -> Result<(&str, String)> {
+pub fn parse_scheme(input: &str) -> Result<(&str, String)> {
     if let Some(i) = input.quickfind(b':') {
         if &input[..i] == "pkg" {
             let mut j = i + 1;
@@ -23,7 +23,7 @@ pub fn parse_scheme<'a>(input: &str) -> Result<(&str, String)> {
     }
 }
 
-pub fn parse_subpath<'a>(input: &str) -> Result<(&str, Option<String>)> {
+pub fn parse_subpath(input: &str) -> Result<(&str, Option<String>)> {
     if let Some(i) = input.quickrfind(b'#') {
         let mut subpath = String::with_capacity(i + 1);
         let mut components = input[i + 1..]
@@ -38,7 +38,7 @@ pub fn parse_subpath<'a>(input: &str) -> Result<(&str, Option<String>)> {
                 return Err(Error::InvalidSubpathSegment(decoded.to_string()));
             }
         }
-        while let Some(c) = components.next() {
+        for c in components {
             let decoded = c.decode().decode_utf8()?;
             if validation::is_subpath_segment_valid(&decoded) {
                 subpath.push('/');
@@ -53,13 +53,13 @@ pub fn parse_subpath<'a>(input: &str) -> Result<(&str, Option<String>)> {
     }
 }
 
-pub fn parse_qualifiers<'a>(input: &str) -> Result<(&str, Vec<(String, String)>)> {
+pub fn parse_qualifiers(input: &str) -> Result<(&str, Vec<(String, String)>)> {
     if let Some(i) = input.quickrfind(b'?') {
         let mut qualifiers = Vec::new();
         let pairs = input[i + 1..]
             .split('&')
-            .map(|ref pair| utils::cut(pair, b'='))
-            .filter(|ref pair| !pair.1.is_empty());
+            .map(|pair| utils::cut(pair, b'='))
+            .filter(|pair| !pair.1.is_empty());
         for (key, value) in pairs {
             if validation::is_qualifier_key_valid(key) {
                 qualifiers.push((
@@ -76,7 +76,7 @@ pub fn parse_qualifiers<'a>(input: &str) -> Result<(&str, Vec<(String, String)>)
     }
 }
 
-pub fn parse_version<'a>(input: &str) -> Result<(&str, Option<String>)> {
+pub fn parse_version(input: &str) -> Result<(&str, Option<String>)> {
     if let Some(i) = input.quickrfind(b'@') {
         Ok((
             &input[..i],
@@ -87,17 +87,17 @@ pub fn parse_version<'a>(input: &str) -> Result<(&str, Option<String>)> {
     }
 }
 
-pub fn parse_type<'a>(input: &str) -> Result<(&str, String)> {
+pub fn parse_type(input: &str) -> Result<(&str, String)> {
     match input.quickfind(b'/') {
         Some(i) if validation::is_type_valid(&input[..i]) => {
-            Ok((&input[i + 1..], input[..i].to_lowercase().into()))
+            Ok((&input[i + 1..], input[..i].to_lowercase()))
         }
         Some(i) => Err(Error::InvalidType(input[..i].to_string())),
         None => Err(Error::MissingType),
     }
 }
 
-pub fn parse_name<'a>(input: &str) -> Result<(&str, String)> {
+pub fn parse_name(input: &str) -> Result<(&str, String)> {
     let (rem, name) = utils::rcut(input.trim_matches('/'), b'/');
     if name.is_empty() {
         Err(Error::MissingName)
@@ -107,7 +107,7 @@ pub fn parse_name<'a>(input: &str) -> Result<(&str, String)> {
     }
 }
 
-pub fn parse_namespace<'a>(input: &str) -> Result<(&str, Option<String>)> {
+pub fn parse_namespace(input: &str) -> Result<(&str, Option<String>)> {
     if !input.is_empty() {
         let mut namespace = String::with_capacity(input.len());
         let mut components = input
@@ -122,7 +122,7 @@ pub fn parse_namespace<'a>(input: &str) -> Result<(&str, Option<String>)> {
                 return Err(Error::InvalidNamespaceComponent(decoded.to_string()));
             }
         }
-        while let Some(c) = components.next() {
+        for c in components {
             let decoded = c.decode().decode_utf8()?;
             if validation::is_namespace_component_valid(&decoded) {
                 namespace.push('/');
