@@ -33,11 +33,19 @@ jobs:
         with:
           path: target
           key: ${{ runner.os }}-cargo-${{ matrix.rust-toolchain }}-${{ matrix.feature }}
+
+      - name: Install cargo-binstall
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+
+      - name: Install cargo-tarpaulin
+        run: |
+          cargo binstall -y cargo-tarpaulin
+
       - name: Measure code coverage with ${{ matrix.feature }} feature
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.16.0'
-          args: '-v --out Xml --ciserver github-actions --no-default-features --features=${{ matrix.feature }}'
+        run: |
+          cargo tarpaulin -v --out Xml --ciserver github-actions --no-default-features --features=${{ matrix.feature }} 
+
       - name: Upload coverage statistics
         uses: codecov/codecov-action@v4
         with:
