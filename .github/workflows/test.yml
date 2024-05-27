@@ -54,7 +54,8 @@ jobs:
 
       - name: Run Clippy
         run: |
-          cargo clippy --all-targets --no-default-features --features=${{ matrix.feature }} -- -D warnings  
+          # we need to exclude --bench, as it only works on nightly
+          cargo clippy --lib --bins --tests --no-default-features --features=${{ matrix.feature }} -- -D warnings  
 
   all-tests:
     runs-on: ubuntu-22.04

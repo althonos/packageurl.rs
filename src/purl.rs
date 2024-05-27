@@ -98,7 +98,7 @@ impl<'a> PackageUrl<'a> {
                         n = Cow::Owned(n.to_lowercase());
                     }
                     if n.chars().any(|c| c == '_') {
-                        n = Cow::Owned(n.replace("_", "-"));
+                        n = Cow::Owned(n.replace('_', "-"));
                     }
                 }
                 _ => {}
@@ -237,11 +237,11 @@ impl FromStr for PackageUrl<'static> {
         // Special rules for some types
         match ty.as_ref() {
             "bitbucket" | "github" => {
-                name = name.to_lowercase().into();
-                namespace = namespace.map(|ns| ns.to_lowercase().into());
+                name = name.to_lowercase();
+                namespace = namespace.map(|ns| ns.to_lowercase());
             }
             "pypi" => {
-                name = name.replace('_', "-").to_lowercase().into();
+                name = name.replace('_', "-").to_lowercase();
             }
             _ => {}
         };
@@ -301,7 +301,7 @@ impl Display for PackageUrl<'_> {
                     .and(f.write_str("="))
                     .and(v.encode(ENCODE_SET).fmt(f))?;
             }
-            while let Some((k, v)) = iter.next() {
+            for (k, v) in iter {
                 f.write_str("&")
                     .and(k.fmt(f))
                     .and(f.write_str("="))
@@ -314,11 +314,11 @@ impl Display for PackageUrl<'_> {
             f.write_str("#")?;
             let mut components = sp
                 .split('/')
-                .filter(|&s| !(s == "" || s == "." || s == ".."));
+                .filter(|&s| !(s.is_empty() || s == "." || s == ".."));
             if let Some(component) = components.next() {
                 component.encode(ENCODE_SET).fmt(f)?;
             }
-            while let Some(component) = components.next() {
+            for component in components {
                 f.write_str("/")?;
                 component.encode(ENCODE_SET).fmt(f)?;
             }
