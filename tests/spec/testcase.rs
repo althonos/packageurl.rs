@@ -5,6 +5,7 @@ use std::collections::HashMap;
 static TEST_SUITE: &[u8] = include_bytes!("test-suite-data.json");
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct SpecTestCase<'a> {
     pub description: Cow<'a, str>,
     pub purl: Cow<'a, str>,
