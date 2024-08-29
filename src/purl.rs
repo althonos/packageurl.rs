@@ -19,6 +19,7 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     .add(b' ')
     .add(b'"')
     .add(b'#')
+    .add(b'%')
     .add(b'<')
     .add(b'>')
     .add(b'`')
@@ -385,6 +386,27 @@ mod tests {
             .unwrap()
             .to_string();
         assert_eq!(&purl_string, canonical);
+    }
+
+    #[test]
+    fn test_percent_encoding_idempotent() {
+        let orig = "pkg:brew/openssl%25401.1@1.1.1w";
+        let round_trip = orig.parse::<PackageUrl>().unwrap().to_string();
+        assert_eq!(orig, round_trip);
+    }
+
+    #[test]
+    fn test_percent_encoding_qualifier() {
+        let mut purl = "pkg:deb/ubuntu/gnome-calculator@1:41.1-2ubuntu2"
+            .parse::<PackageUrl>()
+            .unwrap();
+        purl.add_qualifier(
+            "vcs_url",
+            "git+https://salsa.debian.org/gnome-team/gnome-calculator.git@debian/1%41.1-2",
+        )
+        .unwrap();
+        let encoded = purl.to_string();
+        assert_eq!(encoded, "pkg:deb/ubuntu/gnome-calculator@1:41.1-2ubuntu2?vcs_url=git+https://salsa.debian.org/gnome-team/gnome-calculator.git%40debian/1%2541.1-2");
     }
 
     #[cfg(feature = "serde")]
