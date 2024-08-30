@@ -35,15 +35,6 @@
 //! [`'static`]: https://doc.rust-lang.org/reference/items/static-items.html#static-lifetime-elision
 #![doc(issue_tracker_base_url = "https://github.com/althonos/packageurl-rs/issues/")]
 
-#[cfg(feature = "memchr")]
-extern crate memchr;
-#[cfg(feature = "serde")]
-#[macro_use]
-extern crate serde;
-#[macro_use]
-extern crate thiserror;
-extern crate percent_encoding;
-
 mod errors;
 mod parser;
 mod purl;
@@ -53,3 +44,6 @@ mod validation;
 pub use errors::Error;
 pub use errors::Result;
 pub use purl::PackageUrl;
+
+#[cfg(feature = "packageurl_0_3")]
+pub mod v0_3;

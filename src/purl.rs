@@ -7,7 +7,7 @@ use std::str::FromStr;
 
 use percent_encoding::AsciiSet;
 #[cfg(feature = "serde")]
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::errors::Error;
 use super::errors::Result;
@@ -42,17 +42,17 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PackageUrl<'a> {
     /// The package URL type.
-    ty: Cow<'a, str>,
+    pub(crate) ty: Cow<'a, str>,
     /// The optional namespace
-    namespace: Option<Cow<'a, str>>,
+    pub(crate) namespace: Option<Cow<'a, str>>,
     /// The package name.
-    name: Cow<'a, str>,
+    pub(crate) name: Cow<'a, str>,
     /// The optional package version.
-    version: Option<Cow<'a, str>>,
+    pub(crate) version: Option<Cow<'a, str>>,
     /// The package qualifiers.
-    qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    pub(crate) qualifiers: HashMap<Cow<'a, str>, Cow<'a, str>>,
     /// The package subpath.
-    subpath: Option<Cow<'a, str>>,
+    pub(crate) subpath: Option<Cow<'a, str>>,
 }
 
 impl<'a> PackageUrl<'a> {

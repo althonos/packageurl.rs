@@ -1,6 +1,7 @@
 [package]
 name = "packageurl"
 version = "0.4.1"
+edition = "2018"
 authors = [
     "Martin Larralde <martin.larralde@embl.de>",
     "Jens Reimann <ctron@dentrassi.de>",
@@ -20,11 +21,15 @@ thiserror = "1.0.0"
 memchr = { version = "2.4.0", optional = true }
 serde = { version = "1.0.0", optional = true, features = ["derive"] }
 
+packageurl_0_3 = { version = "0.3.0", package = "packageurl", optional = true }
+
 [features]
 default = []
+v0_3 = []
 
 [dev-dependencies]
+lazy_static = "^1.0.0"
+rstest = "0.22.0"
 serde = { version = "1.0.0", features = ["derive"] }
 serde_json = "1.0.13"
-lazy_static = "^1.0.0"
 url = "2"
