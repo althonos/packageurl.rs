@@ -20,7 +20,7 @@ Add this crate to the `Cargo.toml`:
 
 ```toml
 [dependencies]
-packageurl = "0.4.0"
+packageurl = "0.4.1"
 ```
 
 Parse a string containing a raw PURL using the
@@ -58,7 +58,7 @@ fn example() {
 
 ```toml
 [dependencies]
-packageurl = { version = "0.4.0", features = ["serde"] }
+packageurl = { version = "0.4.1", features = ["serde"] }
 ```
 
 See more in the [online documentation](https://docs.rs/packageurl/).
