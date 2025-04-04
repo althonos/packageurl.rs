@@ -30,6 +30,7 @@ const ENCODE_SET: &AsciiSet = &percent_encoding::CONTROLS
     // .add(b':')
     .add(b';')
     .add(b'=')
+    .add(b'+')
     .add(b'@')
     .add(b'\\')
     .add(b'[')
@@ -406,7 +407,7 @@ mod tests {
         )
         .unwrap();
         let encoded = purl.to_string();
-        assert_eq!(encoded, "pkg:deb/ubuntu/gnome-calculator@1:41.1-2ubuntu2?vcs_url=git+https://salsa.debian.org/gnome-team/gnome-calculator.git%40debian/1%2541.1-2");
+        assert_eq!(encoded, "pkg:deb/ubuntu/gnome-calculator@1:41.1-2ubuntu2?vcs_url=git%2Bhttps://salsa.debian.org/gnome-team/gnome-calculator.git%40debian/1%2541.1-2");
     }
 
     #[cfg(feature = "serde")]
@@ -426,5 +427,18 @@ mod tests {
         let purl2: PackageUrl = serde_json::from_str(&j).unwrap();
 
         assert_eq!(purl, purl2);
+    }
+
+    #[test]
+    fn test_plus_sign_in_version() {
+        let expected = "pkg:type/name@1%2Bx";
+        for purl in [
+            "pkg:type/name@1+x",
+            "pkg:type/name@1%2bx",
+            "pkg:type/name@1%2Bx",
+        ] {
+            let actual = PackageUrl::from_str(purl).unwrap().to_string();
+            assert_eq!(actual, expected);
+        }
     }
 }
