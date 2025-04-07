@@ -25,7 +25,7 @@ impl PercentCodec for str {
     }
 }
 
-impl<'a> PercentCodec for ::std::borrow::Cow<'a, str> {
+impl PercentCodec for ::std::borrow::Cow<'_, str> {
     fn encode<'s>(&self, encode_set: &'static AsciiSet) -> PercentEncode {
         self.as_bytes().encode(encode_set)
     }
