@@ -27,8 +27,6 @@ Parse a string containing a raw PURL using the
 [`FromStr`](https://doc.rust-lang.org/std/str/trait.FromStr.html) trait:
 
 ```rust
-extern crate packageurl;
-
 use std::str::FromStr;
 use packageurl::PackageUrl;
 
@@ -41,8 +39,6 @@ Creating a PURL from Rust and then generating a string representation using:
 the [`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html) trait:
 
 ```rust
-extern crate packageurl;
-
 use std::string::ToString;
 
 fn example() {
@@ -58,7 +54,7 @@ fn example() {
 
 ```toml
 [dependencies]
-packageurl = { version = "0.4.1", features = ["serde"] }
+packageurl = { version = "0.5.0", features = ["serde"] }
 ```
 
 See more in the [online documentation](https://docs.rs/packageurl/).
@@ -73,8 +69,7 @@ See more in the [online documentation](https://docs.rs/packageurl/).
 ## 📋 Changelog
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) and provides
-a [changelog](https://github.com/althonos/packageurl-rs/blob/master/CHANGELOG.md) as part of
-the [GitHub releases](https://github.com/althonos/packageurl.rs/releases).
+a changelog as part of the [GitHub releases](https://github.com/scm-rs/packageurl.rs/releases).
 
 ## 💭 Feedback
 
