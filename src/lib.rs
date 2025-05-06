@@ -44,6 +44,3 @@ mod validation;
 pub use errors::Error;
 pub use errors::Result;
 pub use purl::PackageUrl;
-
-#[cfg(feature = "packageurl_0_3")]
-pub mod v0_3;
