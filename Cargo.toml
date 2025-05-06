@@ -29,6 +29,7 @@ default = []
 v0_3 = []
 
 [dev-dependencies]
+criterion = "0.5.1"
 lazy_static = "^1.0.0"
 rstest = "0.22.0"
 serde = { version = "1.0.0", features = ["derive"] }
