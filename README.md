@@ -1,13 +1,13 @@
-# `packageurl-rs` [![Star me](https://img.shields.io/github/stars/althonos/packageurl-rs.svg?style=social&label=Star&maxAge=3600)](https://github.com/althonos/packageurl-rs/stargazers)
+#
+
+`packageurl-rs` [![Star me](https://img.shields.io/github/stars/scm-rs/packageurl.rs.svg?style=social&label=Star)](https://github.com/scm-rs/packageurl.rs/stargazers)
 
 *Read and generate Package URLs in Rust.*
 
-[![Actions](https://img.shields.io/github/checks-status/althonos/packageurl-rs/master?maxAge=600&style=flat-square)](https://github.com/althonos/packageurl.rs/actions)
-[![Codecov](https://img.shields.io/codecov/c/github/althonos/packageurl.rs.svg?maxAge=600&style=flat-square)](https://codecov.io/github/althonos/packageurl.rs)
-[![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=86400&style=flat-square)](https://github.com/althonos/packageurl.rs)
-[![Crate](https://img.shields.io/crates/v/packageurl.svg?maxAge=86400&style=flat-square)](https://crates.io/crates/packageurl)
-[![Documentation](https://img.shields.io/badge/docs-latest-4d76ae.svg?maxAge=86400&style=flat-square)](https://docs.rs/packageurl)
-[![GitHub issues](https://img.shields.io/github/issues/althonos/packageurl-rs.svg?style=flat-square&maxAge=600)](https://github.com/althonos/packageurl-rs/issues)
+[![CI](https://github.com/scm-rs/packageurl.rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/scm-rs/packageurl.rs/actions/workflows/ci.yaml)
+[![crates.io](https://img.shields.io/crates/v/packageurl.svg)](https://crates.io/crates/packageurl)
+[![docs.rs](https://docs.rs/packageurl/badge.svg)](https://docs.rs/packageurl)
+[![GitHub issues](https://img.shields.io/github/issues/scm-rs/packageurl.rs.svg)](https://github.com/scm-rs/packageurl.rs/issues)
 
 ## About
 
@@ -20,7 +20,7 @@ Add this crate to the `Cargo.toml`:
 
 ```toml
 [dependencies]
-packageurl = "0.4.1"
+packageurl = "0.5.0"
 ```
 
 Parse a string containing a raw PURL using the
