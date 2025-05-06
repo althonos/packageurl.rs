@@ -1,24 +1,21 @@
-name: Publish to Crates.io
+name: release
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
+
+permissions:
+  contents: write # for creating releases
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    environment: Crates.io
-    name: Publish Rust crate
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup | Rust
-        run: |
-          rustup toolchain install stable --profile minimal
-          rustup default stable
-      - name: Package and publish crate
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
-        run: |
-          cargo publish
+
+  ci:
+    uses: ./.github/workflows/ci.yaml
+
+  release:
+    needs:
+      - ci
+    uses: scm-rs/shared-workflows/.github/workflows/release.yaml@main
+    secrets:
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
