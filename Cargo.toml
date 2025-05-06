@@ -13,7 +13,7 @@ repository = "https://github.com/althonos/packageurl-rs"
 readme = "README.md"
 keywords = ["purl", "package-url"]
 categories = ["parser-implementations", "encoding", "development-tools"]
-rust-version = "1.70.0"
+rust-version = "1.81.0" # due to litemap
 
 [dependencies]
 percent-encoding = "2.1.0"
