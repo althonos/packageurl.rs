@@ -4,12 +4,12 @@ macro_rules! spec_tests {
 
             use super::testcase::SpecTestCase;
             use packageurl::PackageUrl;
-            use std::str::FromStr;
             use std::borrow::Cow;
+            use std::str::FromStr;
+            use std::sync::LazyLock;
 
-            lazy_static! {
-                static ref TEST_CASE: SpecTestCase<'static> = SpecTestCase::new($desc);
-            }
+            static TEST_CASE: LazyLock<SpecTestCase<'static>> =
+                LazyLock::new(|| SpecTestCase::new($desc));
 
             #[test]
             fn purl_to_components() {
@@ -17,7 +17,10 @@ macro_rules! spec_tests {
                     assert!(!TEST_CASE.is_invalid);
                     assert_eq!(TEST_CASE.ty.as_ref().unwrap().as_ref(), purl.ty());
                     assert_eq!(TEST_CASE.name.as_ref().unwrap().as_ref(), purl.name());
-                    assert_eq!(TEST_CASE.namespace.as_ref().map(Cow::as_ref), purl.namespace());
+                    assert_eq!(
+                        TEST_CASE.namespace.as_ref().map(Cow::as_ref),
+                        purl.namespace()
+                    );
                     assert_eq!(TEST_CASE.version.as_ref().map(Cow::as_ref), purl.version());
                     assert_eq!(TEST_CASE.subpath.as_ref().map(Cow::as_ref), purl.subpath());
                     if let Some(ref quals) = TEST_CASE.qualifiers {
@@ -36,8 +39,11 @@ macro_rules! spec_tests {
                     return;
                 }
 
-                let mut purl = PackageUrl::new(TEST_CASE.ty.as_ref().unwrap().clone(), TEST_CASE.name.as_ref().unwrap().clone())
-                    .unwrap();
+                let mut purl = PackageUrl::new(
+                    TEST_CASE.ty.as_ref().unwrap().clone(),
+                    TEST_CASE.name.as_ref().unwrap().clone(),
+                )
+                .unwrap();
 
                 if let Some(ref ns) = TEST_CASE.namespace {
                     purl.with_namespace(ns.as_ref());
@@ -57,7 +63,10 @@ macro_rules! spec_tests {
                     }
                 }
 
-                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string());
+                assert_eq!(
+                    TEST_CASE.canonical_purl.as_ref().unwrap(),
+                    &purl.to_string()
+                );
             }
 
             #[test]
@@ -66,8 +75,12 @@ macro_rules! spec_tests {
                     return;
                 }
 
-                let purl = PackageUrl::from_str(&TEST_CASE.canonical_purl.as_ref().unwrap()).unwrap();
-                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string());
+                let purl =
+                    PackageUrl::from_str(&TEST_CASE.canonical_purl.as_ref().unwrap()).unwrap();
+                assert_eq!(
+                    TEST_CASE.canonical_purl.as_ref().unwrap(),
+                    &purl.to_string()
+                );
             }
 
             #[test]
@@ -76,9 +89,11 @@ macro_rules! spec_tests {
                     return;
                 }
                 let purl = PackageUrl::from_str(&TEST_CASE.purl).unwrap();
-                assert_eq!(TEST_CASE.canonical_purl.as_ref().unwrap(), &purl.to_string())
+                assert_eq!(
+                    TEST_CASE.canonical_purl.as_ref().unwrap(),
+                    &purl.to_string()
+                )
             }
-
         }
     };
 }
